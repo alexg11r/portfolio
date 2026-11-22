@@ -6,7 +6,8 @@
   <title>DesAlexG — Разработка продающих лендингов и сайтов под ключ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
   <style>
     :root {
       --bg: #f4f3ef;
@@ -49,16 +50,18 @@
     }
     section[id] { scroll-margin-top: 76px; }
 
-    /* Scroll Progress Bar */
+    /* Scroll Progress Bar (GPU scaleX — zero layout reflow) */
     .scroll-progress {
       position: fixed;
       top: 0;
       left: 0;
       height: 3px;
-      width: 0%;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left center;
+      will-change: transform;
       background: linear-gradient(90deg, #3b82f6, #22d3ee, #10b981);
       z-index: 120;
-      transition: width 0.08s linear;
     }
 
     /* Reveal & Scrub Line */
@@ -124,17 +127,24 @@
       color: var(--ink);
     }
     .brand-dot {
+      position: relative;
       width: 9px;
       height: 9px;
       border-radius: 50%;
       background: var(--emerald);
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-      animation: pulseDot 2.2s infinite;
     }
-    @keyframes pulseDot {
-      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65); }
-      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    .brand-dot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.55);
+      animation: pulseRing 2.2s ease-out infinite;
+    }
+    @keyframes pulseRing {
+      0% { transform: scale(1); opacity: 0.7; }
+      70% { transform: scale(2.2); opacity: 0; }
+      100% { transform: scale(2.2); opacity: 0; }
     }
     .nav { display: flex; align-items: center; gap: 24px; font-size: 13px; font-weight: 700; color: var(--muted); }
     .nav-sq { width: 7px; height: 7px; border-radius: 2px; display: inline-block; animation: spinSlow 4.5s linear infinite; }
@@ -248,7 +258,7 @@
       padding-top: 24px;
       border-top: 1px solid var(--dark-border);
     }
-    .metric-val { font-size: 28px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+    .metric-val { font-size: 28px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
     .metric-lbl { font-size: 13px; color: #94a3b8; margin-top: 2px; }
 
     /* Sleek Low-Profile Translucent Glass Dock under the 3D Pearl (host-ai.site inspired) */
@@ -337,6 +347,7 @@
       border-bottom: 1px solid rgba(0,0,0,0.08);
     }
     .ticker-track { display: inline-flex; gap: 36px; animation: tickerMove 26s linear infinite; }
+    .ticker.paused .ticker-track { animation-play-state: paused; }
     @keyframes tickerMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
     /* Section Headings */
@@ -504,20 +515,15 @@
     .work-card[data-project="1"] .work-viewport { aspect-ratio: 4 / 5; background: #ffffff; }
     .work-card[data-project="2"] .work-viewport { background: #f6f2eb; }
     .work-card[data-project="3"] .work-viewport { background: #523be4; }
-    .work-iframe {
+    .work-shot {
       position: absolute;
-      left: 0;
-      top: 0;
-      width: 1366px;
-      height: 854px;
-      border: 0;
-      pointer-events: none;
-      transform-origin: left top;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
       display: block;
-      opacity: 0;
-      transition: opacity 0.35s ease;
     }
-    .work-iframe.ready { opacity: 1; }
 
     .work-meta {
       display: grid;
@@ -915,6 +921,8 @@
       .workflow-sticky { position: static; }
       .hero-right-col { min-height: auto; }
       .flip-card { height: 270px; }
+      #heroCanvas, .section-ambient-canvas, #finaleCanvas, .paper-grain, .dock-ripple { display: none !important; }
+      .hero { background: radial-gradient(circle at 86% 14%, rgba(59, 130, 246, 0.25) 0%, rgba(21, 35, 64, 0.94) 40%, #0a0d14 80%); }
     }
     @media (max-width: 680px) {
       .nav, .header-cta { display: none; }
@@ -932,7 +940,21 @@
         border-radius: 18px;
         box-shadow: 0 18px 36px rgba(0,0,0,0.16);
       }
-      .hero-metrics, .focus-row.active .focus-body, .dock-pills { grid-template-columns: 1fr; }
+      .hero { margin-top: -72px; padding: 94px 0 38px; min-height: auto; }
+      .hero-grid { gap: 24px; }
+      .photo-pill { font-size: 11.5px; padding: 4px 12px 4px 5px; gap: 7px; margin-bottom: 16px; white-space: nowrap; }
+      h1 { font-size: clamp(28px, 8.2vw, 36px); margin-bottom: 12px; }
+      .hero-sub { font-size: 14.5px; line-height: 1.48; margin-bottom: 18px; }
+      .hero-cta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 22px; }
+      .hero-cta .btn { padding: 12px 10px; font-size: 13px; white-space: nowrap; }
+      .hero-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding-top: 16px; }
+      .metric-val { font-size: 20px; }
+      .metric-lbl { font-size: 11px; line-height: 1.25; }
+      .dock-aura-wrap { padding: 0; }
+      .hero-dock { padding: 14px; border-radius: 16px; }
+      .dock-pills { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .dock-item img { height: 54px; }
+      .focus-row.active .focus-body { grid-template-columns: 1fr; }
       .pill-cta-bar { border-radius: 22px; padding: 22px; }
     }
   </style>
@@ -970,8 +992,8 @@
       <div class="container hero-grid">
         <div>
           <div class="photo-pill">
-            <img src="assets/dev-workspace.jpg" alt="Студийная разработка" decoding="async" fetchpriority="high" />
-            <span>Свободен для заказов · Общение в чате без созвонов</span>
+            <img src="assets/thumbs/workspace-mini.jpg" alt="Студийная разработка" decoding="async" fetchpriority="high" />
+            <span>Свободен · Работа в чате без созвонов</span>
           </div>
           <h1>
             <span class="drift-line" data-drift="-0.09">Создаю быстрые</span>
@@ -1011,19 +1033,19 @@
               </div>
               <div class="dock-pills">
                 <a href="demos/01-detailing/index.html" class="dock-item">
-                  <img src="assets/detailing-hero.jpg" alt="BLACKLINE Detailing" decoding="async" />
+                  <img src="assets/thumbs/detailing-dock.jpg" alt="BLACKLINE Detailing" decoding="async" />
                   <div>BLACKLINE</div>
                 </a>
                 <a href="demos/02-finance-b2b/index.html" class="dock-item">
-                  <img src="assets/finance-hero.jpg" alt="СчётПро" decoding="async" />
+                  <img src="assets/thumbs/finance-dock.jpg" alt="СчётПро" decoding="async" />
                   <div>СчётПро</div>
                 </a>
                 <a href="demos/03-loft-studio/index.html" class="dock-item">
-                  <img src="assets/loft-hero.jpg" alt="MATERIA" decoding="async" />
+                  <img src="assets/thumbs/loft-dock.jpg" alt="MATERIA" decoding="async" />
                   <div>MATERIA</div>
                 </a>
                 <a href="demos/04-edtech-platform/index.html" class="dock-item">
-                  <img src="assets/edu-study.jpg" alt="КАМПУС EdTech" decoding="async" />
+                  <img src="assets/thumbs/edu-dock.jpg" alt="КАМПУС EdTech" decoding="async" />
                   <div>КАМПУС</div>
                 </a>
               </div>
@@ -1074,7 +1096,7 @@
                   <small>blackline-detailing.ru</small>
                 </div>
                 <div class="work-viewport">
-                  <iframe class="work-iframe" data-src="demos/01-detailing/index.html?preview=1" title="BLACKLINE Detailing" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>
+                  <img class="work-shot" src="assets/previews/site-01.jpg" alt="Превью BLACKLINE Detailing" loading="lazy" decoding="async" />
                 </div>
               </div>
               <div class="work-meta">
@@ -1095,7 +1117,7 @@
                   <small>schetpro-b2b.ru</small>
                 </div>
                 <div class="work-viewport">
-                  <iframe class="work-iframe" data-src="demos/02-finance-b2b/index.html?preview=1" title="СчётПро Бухгалтерия" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>
+                  <img class="work-shot" src="assets/previews/site-02.jpg" alt="Превью СчётПро Бухгалтерия" loading="lazy" decoding="async" />
                 </div>
               </div>
               <div class="work-meta">
@@ -1116,7 +1138,7 @@
                   <small>materia-loft.ru</small>
                 </div>
                 <div class="work-viewport">
-                  <iframe class="work-iframe" data-src="demos/03-loft-studio/index.html?preview=1" title="MATERIA Лофт-мебель" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>
+                  <img class="work-shot" src="assets/previews/site-03.jpg" alt="Превью MATERIA Лофт-мебель" loading="lazy" decoding="async" />
                 </div>
               </div>
               <div class="work-meta">
@@ -1137,7 +1159,7 @@
                   <small>kampus-edu.ru</small>
                 </div>
                 <div class="work-viewport">
-                  <iframe class="work-iframe" data-src="demos/04-edtech-platform/index.html?preview=1" title="КАМПУС EdTech-платформа" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>
+                  <img class="work-shot" src="assets/previews/site-04.jpg" alt="Превью КАМПУС EdTech-платформа" loading="lazy" decoding="async" />
                 </div>
               </div>
               <div class="work-meta">
@@ -1193,7 +1215,7 @@
                   <polygon points="92,38 64,82 84,82 74,116 108,70 87,70" fill="url(#boltGold)" stroke="#fff7ed" stroke-width="1.5" />
                 </svg>
                 <div class="flip-top">
-                  <div class="mini-photo-pill"><img src="assets/hero-studio.jpg" alt="" /><span>Скорость</span></div>
+                  <div class="mini-photo-pill"><img src="assets/thumbs/studio-mini.jpg" alt="" loading="lazy" decoding="async" /><span>Скорость</span></div>
                   <div class="flip-badge">↻</div>
                 </div>
                 <div>
@@ -1235,7 +1257,7 @@
                   <path d="M109 108 l6 6 l12 -12" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
                 <div class="flip-top">
-                  <div class="mini-photo-pill"><img src="assets/finance-desk.jpg" alt="" /><span>Экономия</span></div>
+                  <div class="mini-photo-pill"><img src="assets/thumbs/finance-mini.jpg" alt="" loading="lazy" decoding="async" /><span>Экономия</span></div>
                   <div class="flip-badge">↻</div>
                 </div>
                 <div>
@@ -1276,7 +1298,7 @@
                   <circle cx="122" cy="26" r="6" fill="#34d399" stroke="#fff" stroke-width="2" />
                 </svg>
                 <div class="flip-top">
-                  <div class="mini-photo-pill"><img src="assets/dev-workspace.jpg" alt="" /><span>Вовлечение</span></div>
+                  <div class="mini-photo-pill"><img src="assets/thumbs/workspace-mini.jpg" alt="" loading="lazy" decoding="async" /><span>Вовлечение</span></div>
                   <div class="flip-badge">↻</div>
                 </div>
                 <div>
@@ -1488,15 +1510,19 @@
       if (!a.id || a.id !== 'estSendBtn') a.setAttribute('href', tgBaseUrl);
     });
 
-    // === CONTAINED 3D ORBITAL PEARL RENDERER (Hero & Finale — Zero overlap!) ===
+    // === CONTAINED 3D ORBITAL PEARL RENDERER (Desktop only — zero mobile CPU overhead) ===
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const pearlSize = 360;
+    const isMobileViewport = () => window.innerWidth < 980;
+    const pearlSize = 260;
     const pearlCanvas = document.createElement('canvas');
     pearlCanvas.width = pearlSize;
     pearlCanvas.height = pearlSize;
     const pctx = pearlCanvas.getContext('2d');
+    let pearlBuilt = false;
 
-    (function buildPearlSprite() {
+    function buildPearlSprite() {
+      if (pearlBuilt) return;
+      pearlBuilt = true;
       const c = pearlSize / 2;
       const r = pearlSize * 0.44;
       const halo = pctx.createRadialGradient(c, c, r * 0.55, c, c, r * 1.15);
@@ -1544,11 +1570,11 @@
       pctx.fillStyle = spec;
       pctx.fillRect(0, 0, pearlSize, pearlSize);
       pctx.restore();
-    })();
+    }
 
     const labelWidthCache = {};
     function draw3DRing(ctx, cx, cy, radius, tiltX, tiltY, rotZ, phase, isBack, dashed, color, label) {
-      const steps = 44;
+      const steps = 32;
       ctx.save();
       ctx.beginPath();
       if (dashed) ctx.setLineDash([3, 7]);
@@ -1617,9 +1643,15 @@
     const hCtx = heroCanvas.getContext('2d');
     const finaleCanvas = document.getElementById('finaleCanvas');
     const fCtx = finaleCanvas.getContext('2d');
-    let hW = 0, hH = 0, fW = 0, fH = 0;
+    const worksBgCanvas = document.getElementById('worksBgCanvas');
+    const pricingBgCanvas = document.getElementById('pricingBgCanvas');
+    const wCtx = worksBgCanvas ? worksBgCanvas.getContext('2d') : null;
+    const pBgCtx = pricingBgCanvas ? pricingBgCanvas.getContext('2d') : null;
+    let hW = 0, hH = 0, fW = 0, fH = 0, wW = 0, wH = 0, pBgW = 0, pBgH = 0;
 
     function resizeCanvases() {
+      if (isMobileViewport()) return;
+      buildPearlSprite();
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const hr = heroCanvas.parentElement.getBoundingClientRect();
       hW = hr.width; hH = hr.height;
@@ -1630,11 +1662,22 @@
       fW = fr.width; fH = fr.height;
       finaleCanvas.width = fW * dpr; finaleCanvas.height = fH * dpr;
       fCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    window.addEventListener('resize', resizeCanvases);
-    resizeCanvases();
 
-    let targetMx = 0, targetMy = 0, mx = 0, my = 0, dampedY = 0, lastDriftY = -1;
+      if (worksBgCanvas) {
+        const wr = worksBgCanvas.parentElement.getBoundingClientRect();
+        wW = wr.width; wH = wr.height;
+        worksBgCanvas.width = wW * dpr; worksBgCanvas.height = wH * dpr;
+        wCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      if (pricingBgCanvas) {
+        const pr = pricingBgCanvas.parentElement.getBoundingClientRect();
+        pBgW = pr.width; pBgH = pr.height;
+        pricingBgCanvas.width = pBgW * dpr; pricingBgCanvas.height = pBgH * dpr;
+        pBgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+    }
+
+    let targetMx = 0, targetMy = 0, mx = 0, my = 0, dampedY = 0, lastDriftY = -1, rafRunning = false;
     const driftLines = Array.from(document.querySelectorAll('.drift-line')).map(el => ({
       el,
       factor: Number(el.dataset.drift || 0)
@@ -1642,6 +1685,7 @@
     const visState = { hero: true, works: false, pricing: false, finale: false };
 
     window.addEventListener('pointermove', (e) => {
+      if (isMobileViewport()) return;
       targetMx = (e.clientX / window.innerWidth - 0.5) * 2;
       targetMy = (e.clientY / window.innerHeight - 0.5) * 2;
     }, { passive: true });
@@ -1662,14 +1706,25 @@
       draw3DRing(ctx, cx, cy, radius * 1.62, 0.96 - my * 0.12, 0.42 + mx * 0.14, -t * 0.12, -t * 0.5 + 2.4, false, false, 'rgba(110, 231, 183, 0.72)', showLabels ? 'ФОРМА' : null);
     }
 
+    function ensureRafLoop() {
+      if (rafRunning || reducedMotion || isMobileViewport()) return;
+      if (visState.hero || visState.works || visState.pricing || visState.finale) {
+        rafRunning = true;
+        requestAnimationFrame(animateFrame);
+      }
+    }
+
     function animateFrame(now) {
+      if (isMobileViewport() || reducedMotion || (!visState.hero && !visState.works && !visState.pricing && !visState.finale)) {
+        rafRunning = false;
+        return;
+      }
       const t = now * 0.001;
       mx += (targetMx - mx) * 0.08;
       my += (targetMy - my) * 0.08;
       dampedY += (window.scrollY - dampedY) * 0.14;
 
-      // Drift Hero lines only when scroll position meaningfully changes
-      if (Math.abs(dampedY - lastDriftY) > 0.15) {
+      if (visState.hero && Math.abs(dampedY - lastDriftY) > 0.2) {
         lastDriftY = dampedY;
         const fade = Math.max(0.2, 1 - dampedY / (hH * 0.9)).toFixed(3);
         driftLines.forEach(item => {
@@ -1679,53 +1734,24 @@
         });
       }
 
-      // Draw Hero 3D Pearl purely inside #heroCanvas when Hero is visible
-      if (visState.hero) {
-        const isDesktop = hW >= 980;
-        const cx = (isDesktop ? hW * 0.72 : hW * 0.82) + mx * 18;
-        const cy = (isDesktop ? hH * 0.42 : hH * 0.14) + my * 12 + Math.sin(t * 1.4) * 6 - dampedY * 0.12;
-        const rad = (isDesktop ? Math.min(hW, hH) * 0.23 : 68) * (0.96 + Math.sin(t * 1.6) * 0.03);
-        drawOrbScene(hCtx, hW, hH, cx, cy, rad, t, isDesktop);
+      if (visState.hero && hW) {
+        const cx = hW * 0.72 + mx * 18;
+        const cy = hH * 0.42 + my * 12 + Math.sin(t * 1.4) * 6 - dampedY * 0.12;
+        const rad = Math.min(hW, hH) * 0.23 * (0.96 + Math.sin(t * 1.6) * 0.03);
+        drawOrbScene(hCtx, hW, hH, cx, cy, rad, t, true);
       }
 
-      // Draw Finale 3D Pearl purely inside #finaleCanvas when visible
-      if (visState.finale) {
+      if (visState.finale && fW) {
         const fCx = fW * 0.8 + mx * 12;
         const fCy = fH * 0.45 + my * 8 + Math.sin(t * 1.2) * 5;
         drawOrbScene(fCtx, fW, fH, fCx, fCy, Math.min(fW, fH) * 0.42, t, false);
       }
 
-      // Draw sparse geometric doodles inside #cases & #pricing only when visible
       if (visState.works) paintAmbientDoodles(worksBgCanvas, wCtx, wW, wH, t);
       if (visState.pricing) paintAmbientDoodles(pricingBgCanvas, pBgCtx, pBgW, pBgH, t + 4);
 
-      if (!reducedMotion) requestAnimationFrame(animateFrame);
+      requestAnimationFrame(animateFrame);
     }
-
-    // Section-scoped sparse sparkles & tilted ovals (inspired by host-ai.site/ru)
-    const worksBgCanvas = document.getElementById('worksBgCanvas');
-    const pricingBgCanvas = document.getElementById('pricingBgCanvas');
-    const wCtx = worksBgCanvas ? worksBgCanvas.getContext('2d') : null;
-    const pBgCtx = pricingBgCanvas ? pricingBgCanvas.getContext('2d') : null;
-    let wW = 0, wH = 0, pBgW = 0, pBgH = 0;
-
-    function syncSectionCanvases() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      if (worksBgCanvas) {
-        const r = worksBgCanvas.parentElement.getBoundingClientRect();
-        wW = r.width; wH = r.height;
-        worksBgCanvas.width = wW * dpr; worksBgCanvas.height = wH * dpr;
-        wCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-      if (pricingBgCanvas) {
-        const r = pricingBgCanvas.parentElement.getBoundingClientRect();
-        pBgW = r.width; pBgH = r.height;
-        pricingBgCanvas.width = pBgW * dpr; pricingBgCanvas.height = pBgH * dpr;
-        pBgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-    }
-    window.addEventListener('resize', syncSectionCanvases);
-    syncSectionCanvases();
 
     const ambientSeeds = [
       { x: 0.04, y: 0.24, type: 'oval', r: 16, rot: -0.4, speed: 0.45, color: 'rgba(168,176,188,0.18)' },
@@ -1764,23 +1790,6 @@
       });
     }
 
-    // Track canvas section visibility + defer iframe hydration until hero settles
-    let iframesHydrated = false;
-    function hydrateWorkIframes() {
-      if (iframesHydrated) return;
-      iframesHydrated = true;
-      document.querySelectorAll('.work-iframe[data-src]').forEach((ifr, idx) => {
-        setTimeout(() => {
-          ifr.addEventListener('load', () => {
-            scaleWorkIframes();
-            ifr.classList.add('ready');
-          }, { once: true });
-          ifr.src = ifr.dataset.src;
-          ifr.removeAttribute('data-src');
-        }, idx * 140);
-      });
-    }
-
     if ('IntersectionObserver' in window) {
       const heroSec = document.getElementById('heroSection');
       const casesSec = document.getElementById('cases');
@@ -1789,24 +1798,21 @@
       const canvasVisIO = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (e.target === heroSec) visState.hero = e.isIntersecting;
-          else if (e.target === casesSec) {
-            visState.works = e.isIntersecting;
-            if (e.isIntersecting) hydrateWorkIframes();
-          }
+          else if (e.target === casesSec) visState.works = e.isIntersecting;
           else if (e.target === pricingSec) visState.pricing = e.isIntersecting;
           else if (e.target === contactSec) visState.finale = e.isIntersecting;
         });
-      }, { rootMargin: '550px 0px' });
+        ensureRafLoop();
+      }, { rootMargin: '250px 0px' });
       [heroSec, casesSec, pricingSec, contactSec].forEach(el => { if (el) canvasVisIO.observe(el); });
     } else {
       visState.works = visState.pricing = visState.finale = true;
     }
-    setTimeout(hydrateWorkIframes, 1450);
 
-    // Opposing scroll parallax drift on #cases asymmetric browser cards
+    // Opposing scroll parallax drift on #cases (desktop only)
     const casesSectionEl = document.getElementById('cases');
     function updateGalleryDrift() {
-      if (!casesSectionEl || !visState.works || reducedMotion || window.innerWidth <= 740) return;
+      if (!casesSectionEl || !visState.works || reducedMotion || isMobileViewport()) return;
       const r = casesSectionEl.getBoundingClientRect();
       const vh = window.innerHeight || 800;
       const centerOffset = (r.top + r.height * 0.5 - vh * 0.5) / vh;
@@ -1814,65 +1820,59 @@
       casesSectionEl.style.setProperty('--gallery-drift', (clamped * 38).toFixed(2) + 'px');
     }
     window.addEventListener('scroll', updateGalleryDrift, { passive: true });
-    window.addEventListener('resize', updateGalleryDrift);
-    updateGalleryDrift();
+    window.addEventListener('resize', () => {
+      resizeCanvases();
+      updateGalleryDrift();
+      ensureRafLoop();
+    });
+    resizeCanvases();
+    if (!reducedMotion && !isMobileViewport()) ensureRafLoop();
 
-    // Scale live real-site iframes proportionally to 1366px desktop width
-    function scaleWorkIframes() {
-      document.querySelectorAll('.work-viewport').forEach((vp) => {
-        const ifr = vp.querySelector('.work-iframe');
-        if (!ifr) return;
-        const w = vp.clientWidth;
-        const h = vp.clientHeight;
-        if (!w || !h) return;
-        const baseW = 1366;
-        const scale = w / baseW;
-        ifr.style.width = baseW + 'px';
-        ifr.style.height = Math.ceil(h / scale) + 'px';
-        ifr.style.transform = `scale(${scale.toFixed(6)})`;
-      });
-    }
-    scaleWorkIframes();
-    window.addEventListener('resize', scaleWorkIframes);
-    if ('ResizeObserver' in window) {
-      const casesGridEl = document.getElementById('casesGrid');
-      if (casesGridEl) new ResizeObserver(scaleWorkIframes).observe(casesGridEl);
-    }
-
-    if (!reducedMotion) requestAnimationFrame(animateFrame);
-    else animateFrame(0);
-
-    // Hero Dock Spotlight
+    // Hero Dock Spotlight (desktop only)
     const heroDock = document.getElementById('heroDock');
     if (heroDock && !reducedMotion) {
       heroDock.addEventListener('pointermove', (e) => {
+        if (isMobileViewport()) return;
         const r = heroDock.getBoundingClientRect();
         heroDock.style.setProperty('--mx', ((e.clientX - r.left) / r.width) * 100 + '%');
         heroDock.style.setProperty('--my', ((e.clientY - r.top) / r.height) * 100 + '%');
       });
     }
 
-    // Scroll Progress & Workflow scroll-sync
+    // Scroll Progress (GPU scaleX, rAF-throttled) & Workflow scroll-sync
     let manualStepLock = false;
     let activeStep = 0;
+    let scrollTicking = false;
+    const progressEl = document.getElementById('scrollProgress');
+    const wfEl = document.getElementById('workflow');
+    const tickerEl = document.querySelector('.ticker');
+    if (tickerEl && 'IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        entries.forEach((e) => tickerEl.classList.toggle('paused', !e.isIntersecting));
+      }).observe(tickerEl);
+    }
     window.addEventListener('scroll', () => {
-      const h = document.documentElement;
-      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100;
-      document.getElementById('scrollProgress').style.width = pct + '%';
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        scrollTicking = false;
+        const h = document.documentElement;
+        const ratio = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+        progressEl.style.transform = `scaleX(${Math.max(0, Math.min(1, ratio)).toFixed(4)})`;
 
-      if (!manualStepLock) {
-        const wf = document.getElementById('workflow');
-        const rect = wf.getBoundingClientRect();
-        const vh = window.innerHeight;
-        if (rect.top < vh * 0.55 && rect.bottom > vh * 0.3) {
-          const progress = Math.max(0, Math.min(0.99, (vh * 0.55 - rect.top) / (rect.height * 0.65)));
-          const autoIdx = Math.floor(progress * 4);
-          if (autoIdx !== activeStep) setWorkflowStep(autoIdx, false);
+        if (!manualStepLock && wfEl) {
+          const rect = wfEl.getBoundingClientRect();
+          const vh = window.innerHeight;
+          if (rect.top < vh * 0.55 && rect.bottom > vh * 0.3) {
+            const progress = Math.max(0, Math.min(0.99, (vh * 0.55 - rect.top) / (rect.height * 0.65)));
+            const autoIdx = Math.floor(progress * 4);
+            if (autoIdx !== activeStep) setWorkflowStep(autoIdx, false);
+          }
         }
-      }
+      });
     }, { passive: true });
 
-    // Count-up animation (2-frame settle avoids startup jank jump)
+    // Smooth Count-up animation (first painted frame always 0%)
     function animateCount(el) {
       if (el.dataset.counted) return;
       el.dataset.counted = '1';
@@ -1880,17 +1880,17 @@
       const isFloat = raw.includes('.');
       const target = Number(raw);
       const suffix = el.dataset.suffix || '';
-      const dur = 1000;
-      requestAnimationFrame(() => requestAnimationFrame((start) => {
-        function tick(now) {
-          const p = Math.min(1, (now - start) / dur);
-          const eased = 1 - Math.pow(1 - p, 3);
-          const val = target * eased;
-          el.textContent = (isFloat ? val.toFixed(1) : Math.round(val).toLocaleString('ru-RU')) + suffix;
-          if (p < 1) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
-      }));
+      const dur = 860;
+      let start = 0;
+      function tick(now) {
+        if (!start) start = now;
+        const p = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = target * eased;
+        el.textContent = (isFloat ? val.toFixed(1) : Math.round(val).toLocaleString('ru-RU')) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
     }
 
     const revealEls = document.querySelectorAll('.reveal, .scrub-line, [data-count]');
