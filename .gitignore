@@ -1,0 +1,13 @@
+# Внутренние шпаргалки и заметки (не публиковать клиентам)
+playbooks/
+
+# Системные и временные файлы
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+*.tmp
+*.bak
+.vscode/
+.idea/
+node_modules/

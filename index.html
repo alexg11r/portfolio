@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DesAlexG — Разработка продающих лендингов и сайтов под ключ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f4f3ef;
+      --surface: #ffffff;
+      --dark: #0a0d14;
+      --dark-elevated: #121722;
+      --dark-card: #171e2d;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --accent-soft: #eff6ff;
+      --border: #e2e4e9;
+      --dark-border: rgba(255, 255, 255, 0.11);
+      --radius: 20px;
+      --container: 1180px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .container {
+      width: min(100% - 32px, var(--container));
+      margin-inline: auto;
+    }
+    section[id] { scroll-margin-top: 76px; }
+
+    /* Scroll Progress Bar */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #22d3ee, #10b981);
+      z-index: 120;
+      transition: width 0.08s linear;
+    }
+
+    /* Reveal & Scrub Line */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px) scale(0.985);
+      transition: opacity 0.68s cubic-bezier(0.22, 1, 0.36, 1), transform 0.68s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .stagger-1 { transition-delay: 0.05s; }
+    .stagger-2 { transition-delay: 0.12s; }
+    .stagger-3 { transition-delay: 0.19s; }
+
+    .scrub-line {
+      height: 1px;
+      width: 26%;
+      background: linear-gradient(90deg, var(--accent), rgba(15, 23, 42, 0.16));
+      margin: 16px 0 32px;
+      transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .scrub-line.visible { width: 100%; }
+    .scrub-line.dark {
+      background: linear-gradient(90deg, #60a5fa, rgba(255, 255, 255, 0.15));
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .scrub-line { opacity: 1; transform: none; width: 100%; transition: none; }
+      * { animation: none !important; }
+    }
+
+    /* Floating Pill Navbar */
+    .nav-shell {
+      position: sticky;
+      top: 12px;
+      z-index: 60;
+      padding: 0 16px;
+      pointer-events: none;
+    }
+    .header {
+      width: min(100%, var(--container));
+      margin-inline: auto;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 999px;
+      box-shadow: 0 14px 36px rgba(9, 12, 18, 0.14);
+      pointer-events: auto;
+      padding: 0 10px 0 22px;
+    }
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 60px;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .brand-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulseDot 2.2s infinite;
+    }
+    @keyframes pulseDot {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .nav { display: flex; align-items: center; gap: 24px; font-size: 13px; font-weight: 700; color: var(--muted); }
+    .nav-sq { width: 7px; height: 7px; border-radius: 2px; display: inline-block; animation: spinSlow 4.5s linear infinite; }
+    .nav-sq.blue { background: var(--accent); }
+    .nav-sq.amber { background: var(--amber); animation-direction: reverse; }
+    @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .nav a:hover { color: var(--ink); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 22px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .btn-nav { padding: 10px 18px; background: var(--dark); color: #fff; font-size: 13px; }
+    .btn-nav:hover { background: var(--accent); transform: translateY(-1px); }
+    .btn-accent { background: var(--accent); color: #fff; box-shadow: 0 10px 26px rgba(37, 99, 235, 0.35); }
+    .btn-accent:hover { background: var(--accent-hover); transform: translateY(-2px); }
+    .btn-ghost { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); color: #ffffff; }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.16); transform: translateY(-2px); }
+    .btn-outline { background: #fff; border-color: var(--border); color: var(--ink); }
+    .btn-outline:hover { border-color: var(--ink); background: var(--ink); color: #fff; }
+
+    .kinetic-link { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+    .kinetic-link .roll-wrap { display: inline-block; height: 1.3em; overflow: hidden; }
+    .kinetic-link .roll-inner { display: flex; flex-direction: column; transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1); }
+    .kinetic-link:hover .roll-inner { transform: translateY(-50%); }
+
+    .burger { display: none; background: var(--bg); border: 1px solid var(--border); color: var(--ink); padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+
+    /* Spacious Living Hero (Contained Canvas — NEVER overlaps lower sections!) */
+    .hero {
+      position: relative;
+      background: radial-gradient(ellipse at 74% 44%, #152340 0%, #0a0d14 68%);
+      color: #f8fafc;
+      margin-top: -72px;
+      padding: 134px 0 84px;
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    #heroCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .hero-grid-texture {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(circle at 60% 45%, black 35%, transparent 80%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .hero-grid {
+      position: relative;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 40px;
+      align-items: end;
+    }
+    .photo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 14px 5px 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 22px;
+    }
+    .photo-pill img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.3); }
+    h1 {
+      margin: 0 0 20px;
+      font-size: clamp(34px, 4.6vw, 58px);
+      line-height: 1.04;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+    }
+    .drift-line { display: block; will-change: transform, opacity; }
+    .text-gradient {
+      background: linear-gradient(95deg, #ffffff 15%, #93c5fd 60%, #6ee7b7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub { margin: 0 0 28px; font-size: 17px; color: #e2e8f0; max-width: 500px; text-shadow: 0 2px 12px rgba(9, 12, 20, 0.72); }
+    .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 34px; }
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      padding-top: 24px;
+      border-top: 1px solid var(--dark-border);
+    }
+    .metric-val { font-size: 28px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; }
+    .metric-lbl { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+
+    /* Sleek Low-Profile Translucent Glass Dock under the 3D Pearl (host-ai.site inspired) */
+    .hero-right-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: 410px;
+    }
+    .dock-aura-wrap {
+      position: relative;
+      padding: 12px;
+    }
+    .dock-ripple {
+      position: absolute;
+      inset: 2px;
+      border-radius: 26px;
+      border: 1px solid rgba(96, 165, 250, 0.25);
+      pointer-events: none;
+      animation: rippleRing 4.5s ease-out infinite;
+    }
+    .dock-ripple.r2 { animation-delay: 2.2s; }
+    @keyframes rippleRing {
+      0% { transform: scale(0.98); opacity: 0.65; }
+      100% { transform: scale(1.06); opacity: 0; }
+    }
+    .hero-dock {
+      position: relative;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(14, 19, 31, 0.72);
+      backdrop-filter: blur(22px);
+      padding: 18px;
+      box-shadow: 0 28px 64px rgba(0, 0, 0, 0.55);
+      overflow: hidden;
+    }
+    .dock-spotlight {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(96, 165, 250, 0.16), transparent 65%);
+    }
+    .dock-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #93c5fd;
+      font-weight: 700;
+      position: relative;
+      z-index: 2;
+    }
+    .dock-pills {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      position: relative;
+      z-index: 2;
+    }
+    .dock-item {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      transition: transform 0.2s, border-color 0.2s;
+      display: block;
+    }
+    .dock-item:hover {
+      transform: translateY(-3px);
+      border-color: #60a5fa;
+    }
+    .dock-item img { width: 100%; height: 64px; object-fit: cover; }
+    .dock-item div { padding: 7px 9px; font-size: 11px; font-weight: 700; color: #f8fafc; }
+
+    /* Ticker */
+    .ticker {
+      background: #fbbf24;
+      color: #111827;
+      overflow: hidden;
+      padding: 11px 0;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .ticker-track { display: inline-flex; gap: 36px; animation: tickerMove 26s linear infinite; }
+    @keyframes tickerMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* Section Headings */
+    .band-eyebrow {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .section-head-split { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+    h2 { margin: 0; font-size: clamp(28px, 3.8vw, 40px); font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; }
+    .section-desc { margin: 10px 0 0; color: var(--muted); max-width: 580px; font-size: 15px; }
+
+    /* Editorial Dark Portfolio Gallery (#cases — inspired by host-ai.site/ru) */
+    .works-section {
+      position: relative;
+      background: #141619;
+      color: #eff0f2;
+      padding: 108px 0 112px;
+      overflow: hidden;
+      border-bottom: 1px solid #30363e;
+    }
+    .section-ambient-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .paper-grain {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.75'/%3E%3C/svg%3E");
+    }
+    .works-heading {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      align-items: end;
+      gap: 64px;
+      margin-bottom: 84px;
+      position: relative;
+      z-index: 2;
+    }
+    .works-heading h2 {
+      font-size: clamp(36px, 4.7vw, 66px);
+      font-weight: 500;
+      line-height: 0.99;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+      color: #eff0f2;
+    }
+    .works-aside {
+      max-width: 340px;
+      justify-self: end;
+    }
+    .works-aside-lead {
+      font-size: 18px;
+      line-height: 1.3;
+      color: #eff0f2;
+      margin: 0 0 10px;
+      font-weight: 500;
+    }
+    .works-aside-note {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #a8b0bc;
+      margin: 0 0 16px;
+    }
+    .works-all-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #eff0f2;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(239, 240, 242, 0.35);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .works-all-link:hover { border-color: #eff0f2; transform: translateX(2px); }
+
+    .works-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 64px 40px;
+      align-items: start;
+      padding: 12px 10px 0;
+    }
+    .work-card {
+      position: relative;
+      transform: translate3d(0, calc(var(--gallery-drift, 0px) * var(--depth, 0)), 0) rotate(var(--roll, 0deg));
+      transition: transform 0.14s linear;
+      will-change: transform;
+    }
+    .work-card[data-project="0"] { grid-column: 1 / 8; grid-row: 1; z-index: 2; --depth: 0.65; --roll: -1.4deg; }
+    .work-card[data-project="1"] { grid-column: 8 / -1; grid-row: 1; margin-top: 108px; --depth: -0.55; --roll: 1.8deg; }
+    .work-card[data-project="2"] { grid-column: 1 / 6; grid-row: 2; margin-top: -72px; z-index: 2; --depth: 0.9; --roll: 1.1deg; }
+    .work-card[data-project="3"] { grid-column: 6 / -1; grid-row: 2; margin-top: 28px; --depth: -0.7; --roll: -1.3deg; }
+
+    .work-open { display: block; width: 100%; border-radius: 12px; }
+    .work-art {
+      overflow: hidden;
+      position: relative;
+      padding: 5px;
+      border: 1px solid rgba(65, 72, 83, 0.7);
+      border-radius: 12px;
+      background: #24282e;
+      box-shadow:
+        0 2px 3px rgba(0, 0, 0, 0.15),
+        0 18px 30px -14px rgba(0, 0, 0, 0.45),
+        0 42px 70px -26px rgba(0, 0, 0, 0.35);
+      transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.35s, box-shadow 0.4s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .work-open:hover .work-art,
+      .work-open:focus-visible .work-art {
+        transform: translateY(-9px) rotate(calc(var(--roll, 0deg) * -1));
+        border-color: rgba(130, 152, 185, 0.55);
+        box-shadow:
+          0 4px 10px rgba(0, 0, 0, 0.25),
+          0 28px 50px -14px rgba(0, 0, 0, 0.65);
+      }
+    }
+    .work-chrome {
+      height: 29px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 8px 5px;
+    }
+    .work-chrome span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(168, 176, 188, 0.45);
+      flex-shrink: 0;
+    }
+    .work-chrome small {
+      min-width: 0;
+      margin-left: 8px;
+      color: #bbc1ca;
+      font-size: 9.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: 0.02em;
+    }
+    .work-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 9px;
+      overflow: hidden;
+      background: #0b0c0f;
+    }
+    .work-card[data-project="1"] .work-viewport { aspect-ratio: 4 / 5; background: #ffffff; }
+    .work-card[data-project="2"] .work-viewport { background: #f6f2eb; }
+    .work-card[data-project="3"] .work-viewport { background: #523be4; }
+    .work-iframe {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1366px;
+      height: 854px;
+      border: 0;
+      pointer-events: none;
+      transform-origin: left top;
+      display: block;
+    }
+
+    .work-meta {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 4px 12px;
+      margin: 20px 8px 0;
+    }
+    .work-meta h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+      color: #eff0f2;
+      overflow-wrap: anywhere;
+    }
+    .work-num {
+      grid-column: 2;
+      grid-row: 1;
+      font-size: 10px;
+      color: #a8b0bc;
+      padding-top: 3px;
+      font-variant-numeric: tabular-nums;
+    }
+    .work-desc {
+      grid-column: 1 / -1;
+      margin: 6px 0 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: #9ba3b0;
+    }
+    .work-domain-link {
+      grid-column: 1;
+      justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #bbc1ca;
+      transition: color 0.2s;
+    }
+    .work-domain-link:hover { color: #ffffff; }
+
+    .works-bottom-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px 40px;
+      align-items: end;
+      margin-top: 18px;
+      padding: 34px 0 8px;
+      border-top: 1px solid #525a65;
+    }
+
+    @media (max-width: 950px) {
+      .works-section { padding: 82px 0 82px; }
+      .works-heading { grid-template-columns: 1fr; gap: 22px; margin-bottom: 48px; }
+      .works-aside { justify-self: start; max-width: 100%; }
+      .works-grid { gap: 52px 28px; }
+      .work-card[data-project="1"] { margin-top: 76px; }
+      .work-card[data-project="2"] { margin-top: -32px; }
+    }
+    @media (max-width: 740px) {
+      .works-section { padding: 64px 0; }
+      .works-grid { grid-template-columns: 1fr; gap: 38px; padding: 0; }
+      .work-card[data-project] { grid-column: auto !important; grid-row: auto !important; margin-top: 0 !important; --roll: 0deg; --depth: 0; }
+      .work-card[data-project="1"] .work-viewport { aspect-ratio: 16 / 10; }
+      .works-bottom-row { grid-template-columns: 1fr; }
+    }
+
+    /* Stone Band: 3D Renders + 3D-Flipping Advantage Cards */
+    .stone-band { background: var(--bg); padding: 80px 0; }
+    .flip-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+    .flip-card { perspective: 1500px; height: 295px; cursor: pointer; }
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+    .flip-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .flip-front { background: linear-gradient(150deg, #ffffff 45%, #f3f6fc 100%); box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06); }
+    .flip-front:hover { border-color: #93c5fd; }
+    .flip-back { background: var(--dark); color: #f8fafc; transform: rotateY(180deg); border-color: var(--dark-border); }
+    .flip-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: relative; z-index: 2; }
+    .flip-badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--ink);
+      flex-shrink: 0;
+      transition: transform 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .flip-card:hover .flip-badge { transform: rotate(90deg); }
+    .flip-back .flip-badge { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #fff; }
+    .card-3d-render {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      width: 145px;
+      height: 145px;
+      pointer-events: none;
+      animation: float3D 4.5s ease-in-out infinite;
+      filter: drop-shadow(0 20px 24px rgba(15, 23, 42, 0.16));
+      transition: transform 0.4s ease;
+    }
+    .flip-card:hover .card-3d-render { transform: translateY(-6px) scale(1.06) rotate(-4deg); }
+    @keyframes float3D { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-8px) rotate(2.5deg); } }
+    .monumental-num { position: relative; z-index: 2; font-size: clamp(36px, 4vw, 48px); font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
+    .mini-photo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px 4px 5px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
+      width: fit-content;
+    }
+    .mini-photo-pill img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+
+    /* Compact Dark Workflow Band */
+    .workflow-section {
+      background-color: var(--dark);
+      background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 28px);
+      color: #f8fafc;
+      padding: 80px 0;
+      border-top: 1px solid var(--dark-border);
+      border-bottom: 1px solid var(--dark-border);
+    }
+    .workflow-layout { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 40px; align-items: start; }
+    .workflow-sticky { position: sticky; top: 96px; }
+    .focus-accordion { display: grid; gap: 12px; }
+    .focus-row {
+      background: rgba(17, 22, 33, 0.85);
+      border: 1px solid var(--dark-border);
+      border-radius: 16px;
+      padding: 18px 22px;
+      cursor: pointer;
+      transition: all 0.28s ease;
+      text-align: left;
+      color: #fff;
+      width: 100%;
+    }
+    .focus-row:hover { border-color: rgba(96, 165, 250, 0.45); }
+    .focus-row.active {
+      background: var(--dark-card);
+      border-color: #60a5fa;
+      box-shadow: 0 18px 42px rgba(37, 99, 235, 0.2);
+      padding: 22px;
+    }
+    .focus-head { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+    .focus-title { display: flex; align-items: center; gap: 14px; font-size: 16px; font-weight: 700; }
+    .focus-row.active .focus-title { font-size: 18px; }
+    .focus-num { font-size: 12px; font-weight: 800; color: #60a5fa; padding: 5px 9px; border-radius: 8px; background: rgba(37, 99, 235, 0.16); }
+    .focus-row.active .focus-num { background: var(--accent); color: #fff; }
+    .focus-body {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--dark-border);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      font-size: 13px;
+      color: #cbd5e1;
+      animation: fadeIn 0.28s ease;
+    }
+    .focus-row.active .focus-body { display: grid; }
+    .focus-body strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #93c5fd; margin-bottom: 4px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Sculpted Dark Pricing & Estimator Band (#pricing — aligned with host-ai.site/ru#pricing) */
+    .pricing-band {
+      position: relative;
+      background: #141619;
+      color: #eff0f2;
+      padding: 94px 0 100px;
+      border-top: 1px solid #525a65;
+      overflow: hidden;
+    }
+    .included-pills {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+      gap: 10px;
+      margin: 26px 0 32px;
+      position: relative;
+      z-index: 2;
+    }
+    .inc-pill {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(239, 240, 242, 0.16);
+      background: rgba(29, 32, 37, 0.75);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #dbe0e8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pricing-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      align-items: stretch;
+    }
+    .price-card {
+      background: #1d2025;
+      border: 1px solid rgba(65, 72, 83, 0.72);
+      border-radius: 20px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 16px 32px -22px rgba(0, 0, 0, 0.55);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s;
+    }
+    .price-card:hover { transform: translateY(-5px); border-color: rgba(148, 163, 184, 0.5); }
+    .price-card.accent {
+      background: linear-gradient(155deg, rgb(120, 186, 230), rgb(240, 107, 168));
+      color: #141619;
+      border: none;
+      box-shadow: 0 24px 44px -22px rgba(240, 107, 168, 0.42);
+    }
+    .price-card.glass-alt {
+      background: linear-gradient(145deg, #24282e, rgba(59, 130, 246, 0.24));
+    }
+    .price-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: #a8b0bc;
+      margin-bottom: 14px;
+    }
+    .price-card.accent .price-card-top { color: rgba(20, 22, 25, 0.75); }
+    .plan-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: #141619;
+      color: #fff;
+    }
+    .price-sum { font-size: 30px; font-weight: 800; margin: 10px 0 6px; letter-spacing: -0.02em; }
+    .price-list { list-style: none; padding: 0; margin: 16px 0 26px; display: grid; gap: 10px; font-size: 13.5px; color: #c7ced9; }
+    .price-card.accent .price-list { color: #1f242c; font-weight: 500; }
+    .price-list li::before { content: "✓ "; color: #60a5fa; font-weight: 800; }
+    .price-card.accent .price-list li::before { color: #141619; }
+    .btn-plan-dark {
+      width: 100%; min-height: 46px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      font-size: 14px; font-weight: 700; transition: transform 0.2s, opacity 0.2s;
+      background: rgba(255,255,255,0.08); color: #eff0f2; border: 1px solid rgba(255,255,255,0.14);
+    }
+    .btn-plan-dark:hover { background: rgba(255,255,255,0.15); transform: translateY(-1px); }
+    .price-card.accent .btn-plan-dark { background: #141619; color: #fff; border-color: #141619; }
+
+    .estimator-card {
+      position: relative;
+      z-index: 2;
+      margin-top: 28px;
+      background: #1d2025;
+      border: 1px solid rgba(65, 72, 83, 0.72);
+      border-radius: 20px;
+      padding: 28px 30px;
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 28px;
+      align-items: center;
+    }
+    .est-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 18px; }
+    .est-pill {
+      padding: 9px 14px;
+      border-radius: 10px;
+      border: 1px solid #414853;
+      background: #24282e;
+      font-size: 13px;
+      font-weight: 600;
+      color: #bbc1ca;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .est-pill.active { background: #eff0f2; color: #141619; border-color: #eff0f2; }
+    .est-addons { display: flex; flex-wrap: wrap; gap: 10px; }
+    .addon-chip {
+      padding: 8px 13px;
+      border-radius: 999px;
+      border: 1px solid #414853;
+      background: #24282e;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #cbd5e1;
+    }
+    .addon-chip.active { background: rgba(96, 165, 250, 0.18); border-color: #60a5fa; color: #93c5fd; }
+    .est-result {
+      background: linear-gradient(145deg, #24282e, #181c24);
+      border: 1px solid rgba(96, 165, 250, 0.26);
+      color: #fff;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    /* Finale Band with Contained Canvas Pearl */
+    .cta-band {
+      position: relative;
+      background: var(--dark);
+      color: #fff;
+      padding: 84px 0 36px;
+      overflow: hidden;
+    }
+    #finaleCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .pill-cta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      background: rgba(255, 255, 255, 0.96);
+      color: var(--ink);
+      padding: 24px 32px;
+      border-radius: 999px;
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+      position: relative;
+      z-index: 3;
+    }
+    .pill-cta-bar:hover { transform: translateY(-3px); box-shadow: 0 24px 54px rgba(37, 99, 235, 0.34); }
+    .pill-cta-arrow {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--dark);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .pill-cta-bar:hover .pill-cta-arrow { background: var(--accent); transform: translateX(4px); }
+
+    .footer-inner {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--dark-border);
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .pricing-grid, .estimator-card, .flip-grid, .workflow-layout { grid-template-columns: 1fr; }
+      .workflow-sticky { position: static; }
+      .hero-right-col { min-height: auto; }
+      .flip-card { height: 270px; }
+    }
+    @media (max-width: 680px) {
+      .nav, .header-cta { display: none; }
+      .burger { display: inline-flex; }
+      .nav.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 68px;
+        left: 0;
+        right: 0;
+        background: #fff;
+        color: var(--ink);
+        padding: 20px;
+        border-radius: 18px;
+        box-shadow: 0 18px 36px rgba(0,0,0,0.16);
+      }
+      .hero-metrics, .focus-row.active .focus-body, .dock-pills { grid-template-columns: 1fr; }
+      .pill-cta-bar { border-radius: 22px; padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <div class="nav-shell">
+    <header class="header">
+      <div class="header-inner">
+        <a href="#" class="brand">
+          <span class="brand-dot"></span>
+          <span id="ownerNameBrand">DesAlexG · Сайты и лендинги</span>
+        </a>
+        <nav class="nav" id="mainNav">
+          <span class="nav-sq blue" aria-hidden="true"></span>
+          <a href="#cases">Проекты</a>
+          <a href="#benefits">Преимущества</a>
+          <a href="#workflow">Этапы</a>
+          <a href="#pricing">Расчёт</a>
+          <span class="nav-sq amber" aria-hidden="true"></span>
+        </nav>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <a href="https://t.me/DesAlexG" class="btn btn-nav header-cta tg-link" target="_blank" rel="noopener">Написать в Telegram</a>
+          <button class="burger" id="burgerBtn" aria-label="Меню">☰</button>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <main>
+    <section class="hero" id="heroSection">
+      <canvas id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="hero-grid-texture" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div>
+          <div class="photo-pill">
+            <img src="assets/dev-workspace.jpg" alt="Студийная разработка" />
+            <span>Свободен для заказов · Общение в чате без созвонов</span>
+          </div>
+          <h1>
+            <span class="drift-line" data-drift="-0.09">Создаю быстрые</span>
+            <span class="drift-line text-gradient" data-drift="0.09">продающие лендинги</span>
+            <span class="drift-line" data-drift="-0.06">за 1–3 дня</span>
+          </h1>
+          <p class="hero-sub">Живые интерактивные сайты на чистом коде — без тормозов, шаблонных конструкторов и ежемесячных подписок. Заявки приходят прямо в ваш Telegram.</p>
+          <div class="hero-cta">
+            <a href="#cases" class="btn btn-accent">Смотреть проекты</a>
+            <a href="https://t.me/DesAlexG" class="btn btn-ghost tg-link" target="_blank" rel="noopener">Написать @DesAlexG</a>
+          </div>
+          <div class="hero-metrics">
+            <div>
+              <div class="metric-val" data-count="24" data-suffix=" ч">24 ч</div>
+              <div class="metric-lbl">на первый рабочий макет</div>
+            </div>
+            <div>
+              <div class="metric-val" data-count="0" data-suffix=" ₽/мес">0 ₽/мес</div>
+              <div class="metric-lbl">подписок за конструкторы</div>
+            </div>
+            <div>
+              <div class="metric-val" data-count="99" data-suffix="/100">99/100</div>
+              <div class="metric-lbl">скорость PageSpeed</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-right-col">
+          <div class="dock-aura-wrap">
+            <div class="dock-ripple" aria-hidden="true"></div>
+            <div class="dock-ripple r2" aria-hidden="true"></div>
+            <div class="hero-dock" id="heroDock">
+              <div class="dock-spotlight"></div>
+              <div class="dock-head">
+                <span>Быстрый переход в проекты</span>
+                <span style="color:#6ee7b7;">● 4 ниши</span>
+              </div>
+              <div class="dock-pills">
+                <a href="demos/01-detailing/index.html" class="dock-item">
+                  <img src="assets/detailing-hero.jpg" alt="BLACKLINE Detailing" />
+                  <div>BLACKLINE</div>
+                </a>
+                <a href="demos/02-finance-b2b/index.html" class="dock-item">
+                  <img src="assets/finance-hero.jpg" alt="СчётПро" />
+                  <div>СчётПро</div>
+                </a>
+                <a href="demos/03-loft-studio/index.html" class="dock-item">
+                  <img src="assets/loft-hero.jpg" alt="MATERIA" />
+                  <div>MATERIA</div>
+                </a>
+                <a href="demos/04-edtech-platform/index.html" class="dock-item">
+                  <img src="assets/edu-study.jpg" alt="КАМПУС EdTech" />
+                  <div>КАМПУС</div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>★ Живая 3D-графика и анимации</span>
+        <span>★ Чистый код без подписок на конструкторы</span>
+        <span>★ Первый рабочий прототип за 24 часа</span>
+        <span>★ Интерактивные калькуляторы и каталоги</span>
+        <span>★ Заявки напрямую в Telegram</span>
+        <span>★ Живая 3D-графика и анимации</span>
+        <span>★ Чистый код без подписок на конструкторы</span>
+        <span>★ Первый рабочий прототип за 24 часа</span>
+        <span>★ Интерактивные калькуляторы и каталоги</span>
+        <span>★ Заявки напрямую в Telegram</span>
+      </div>
+    </div>
+
+    <section id="cases" class="works-section">
+      <canvas class="section-ambient-canvas" id="worksBgCanvas" aria-hidden="true"></canvas>
+      <div class="paper-grain" aria-hidden="true"></div>
+      <div class="container" style="position:relative; z-index:2;">
+        <div class="works-heading reveal">
+          <div>
+            <div class="band-eyebrow" style="color:#a8b0bc;">Портфолио · Живые проекты</div>
+            <h2>Один подход,<br>разные сайты</h2>
+          </div>
+          <div class="works-aside">
+            <p class="works-aside-lead">Каждый экран собран в чистом коде под конкретную задачу бизнеса.</p>
+            <p class="works-aside-note">Нажмите на любое окно браузера ниже, чтобы открыть рабочий сайт, покликать калькуляторы, шоурумы и анимации.</p>
+            <a href="https://t.me/DesAlexG" class="works-all-link tg-link" target="_blank" rel="noopener">Обсудить ваш сайт ↗</a>
+          </div>
+        </div>
+
+        <div class="works-grid" id="casesGrid">
+          <!-- 01 Wide Left -->
+          <article class="work-card" data-project="0">
+            <a href="demos/01-detailing/index.html" class="work-open">
+              <div class="work-art">
+                <div class="work-chrome">
+                  <span></span><span></span><span></span>
+                  <small>blackline-detailing.ru</small>
+                </div>
+                <div class="work-viewport">
+                  <iframe class="work-iframe" src="demos/01-detailing/index.html?preview=1" title="BLACKLINE Detailing" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>
+                </div>
+              </div>
+              <div class="work-meta">
+                <h3>BLACKLINE — Студия автодетейлинга</h3>
+                <span class="work-num">01</span>
+                <p class="work-desc">Тёмный премиальный лендинг со схемой зон защиты кузова, слайдером «До / После» и живым пересчётом цены.</p>
+                <span class="work-domain-link">blackline-detailing.ru ↗</span>
+              </div>
+            </a>
+          </article>
+
+          <!-- 02 Tall Right Offset -->
+          <article class="work-card" data-project="1">
+            <a href="demos/02-finance-b2b/index.html" class="work-open">
+              <div class="work-art">
+                <div class="work-chrome">
+                  <span></span><span></span><span></span>
+                  <small>schetpro-b2b.ru</small>
+                </div>
+                <div class="work-viewport">
+                  <iframe class="work-iframe" src="demos/02-finance-b2b/index.html?preview=1" title="СчётПро Бухгалтерия" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>
+                </div>
+              </div>
+              <div class="work-meta">
+                <h3>СчётПро — Бухгалтерия на аутсорсе</h3>
+                <span class="work-num">02</span>
+                <p class="work-desc">B2B-сайт с онлайн-калькулятором стоимости по системе налогов и обороту, квизом рисков и карточками команды.</p>
+                <span class="work-domain-link">schetpro-b2b.ru ↗</span>
+              </div>
+            </a>
+          </article>
+
+          <!-- 03 Compact Left Overlap -->
+          <article class="work-card" data-project="2">
+            <a href="demos/03-loft-studio/index.html" class="work-open">
+              <div class="work-art">
+                <div class="work-chrome">
+                  <span></span><span></span><span></span>
+                  <small>materia-loft.ru</small>
+                </div>
+                <div class="work-viewport">
+                  <iframe class="work-iframe" src="demos/03-loft-studio/index.html?preview=1" title="MATERIA Лофт-мебель" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>
+                </div>
+              </div>
+              <div class="work-meta">
+                <h3>MATERIA — Мастерская лофт-мебели</h3>
+                <span class="work-num">03</span>
+                <p class="work-desc">Каталог мебели ручной работы с фото-шоурумом, точками изделий прямо на фото и реальными текстурами массива.</p>
+                <span class="work-domain-link">materia-loft.ru ↗</span>
+              </div>
+            </a>
+          </article>
+
+          <!-- 04 Wide Right -->
+          <article class="work-card" data-project="3">
+            <a href="demos/04-edtech-platform/index.html" class="work-open">
+              <div class="work-art">
+                <div class="work-chrome">
+                  <span></span><span></span><span></span>
+                  <small>kampus-edu.ru</small>
+                </div>
+                <div class="work-viewport">
+                  <iframe class="work-iframe" src="demos/04-edtech-platform/index.html?preview=1" title="КАМПУС EdTech-платформа" tabindex="-1" aria-hidden="true" scrolling="no"></iframe>
+                </div>
+              </div>
+              <div class="work-meta">
+                <h3>КАМПУС — EdTech-платформа для школ</h3>
+                <span class="work-num">04</span>
+                <p class="work-desc">Продуктовый сайт с авто-каруселью экранов приложения, bento-сетками, эластичными карточками ролей и FAQ.</p>
+                <span class="work-domain-link">kampus-edu.ru ↗</span>
+              </div>
+            </a>
+          </article>
+
+          <div class="works-bottom-row reveal">
+            <div>
+              <div style="font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:#a8b0bc; margin-bottom:6px;">Следующий кейс</div>
+              <div style="font-size:clamp(20px, 2.5vw, 28px); font-weight:600; letter-spacing:-0.02em; color:#eff0f2;">Соберём рабочий прототип под вашу нишу за 24 часа</div>
+            </div>
+            <a href="https://t.me/DesAlexG" class="btn btn-accent tg-link" target="_blank" rel="noopener">Обсудить в Telegram →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="benefits" class="stone-band">
+      <div class="container">
+        <div class="section-head-split reveal">
+          <div>
+            <div class="band-eyebrow">Факты и цифры · Нажмите на карточку для 3D-разворота</div>
+            <h2>Почему сайт на чистом коде окупается быстрее</h2>
+          </div>
+        </div>
+        <div class="scrub-line"></div>
+
+        <div class="flip-grid">
+          <div class="flip-card reveal stagger-1" onclick="this.classList.toggle('flipped')">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <svg class="card-3d-render" viewBox="0 0 160 160" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="orbBlue" cx="35%" cy="30%" r="70%">
+                      <stop offset="0%" stop-color="#ffffff" />
+                      <stop offset="28%" stop-color="#60a5fa" />
+                      <stop offset="72%" stop-color="#2563eb" />
+                      <stop offset="100%" stop-color="#0f172a" />
+                    </radialGradient>
+                    <linearGradient id="boltGold" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#fef08a" />
+                      <stop offset="50%" stop-color="#f59e0b" />
+                      <stop offset="100%" stop-color="#b45309" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="84" cy="76" r="52" fill="url(#orbBlue)" />
+                  <ellipse cx="70" cy="54" rx="22" ry="12" transform="rotate(-24 70 54)" fill="rgba(255,255,255,0.45)" />
+                  <polygon points="92,38 64,82 84,82 74,116 108,70 87,70" fill="url(#boltGold)" stroke="#fff7ed" stroke-width="1.5" />
+                </svg>
+                <div class="flip-top">
+                  <div class="mini-photo-pill"><img src="assets/hero-studio.jpg" alt="" /><span>Скорость</span></div>
+                  <div class="flip-badge">↻</div>
+                </div>
+                <div>
+                  <div class="monumental-num" data-count="99" data-suffix="/100">99/100</div>
+                  <div style="margin-top:8px;font-size:14px;color:var(--muted);">Мгновенное открытие с мобильного 4G — клиент не закрывает вкладку.</div>
+                </div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="flip-top">
+                  <span style="font-size:12px;font-weight:700;color:#60a5fa;text-transform:uppercase;">Что это даёт продажам</span>
+                  <div class="flip-badge">✕</div>
+                </div>
+                <p style="margin:0;font-size:14px;color:#e2e8f0;">Тяжёлые конструкторы грузятся 3–5 секунд и теряют до трети трафика с рекламы. Чистый код открывается за 0.4 сек и поднимает конверсию в заявку.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flip-card reveal stagger-2" onclick="this.classList.toggle('flipped')">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <svg class="card-3d-render" viewBox="0 0 160 160" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="coinGold" cx="32%" cy="28%" r="72%">
+                      <stop offset="0%" stop-color="#fef9c3" />
+                      <stop offset="35%" stop-color="#fbbf24" />
+                      <stop offset="78%" stop-color="#d97706" />
+                      <stop offset="100%" stop-color="#78350f" />
+                    </radialGradient>
+                    <linearGradient id="emeraldRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#6ee7b7" />
+                      <stop offset="100%" stop-color="#047857" />
+                    </linearGradient>
+                  </defs>
+                  <ellipse cx="90" cy="78" rx="48" ry="50" fill="#92400e" />
+                  <ellipse cx="82" cy="74" rx="48" ry="50" fill="url(#coinGold)" />
+                  <ellipse cx="82" cy="74" rx="36" ry="38" fill="none" stroke="rgba(255,255,255,0.42)" stroke-width="2.5" />
+                  <text x="82" y="90" text-anchor="middle" font-size="44" font-weight="800" fill="#78350f" opacity="0.72">₽</text>
+                  <circle cx="118" cy="108" r="22" fill="url(#emeraldRibbon)" stroke="#ecfdf5" stroke-width="2" />
+                  <path d="M109 108 l6 6 l12 -12" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div class="flip-top">
+                  <div class="mini-photo-pill"><img src="assets/finance-desk.jpg" alt="" /><span>Экономия</span></div>
+                  <div class="flip-badge">↻</div>
+                </div>
+                <div>
+                  <div class="monumental-num" data-count="0" data-suffix=" ₽/мес">0 ₽/мес</div>
+                  <div style="margin-top:8px;font-size:14px;color:var(--muted);">Нет ежемесячной аренды конструктора — сайт полностью принадлежит вам.</div>
+                </div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="flip-top">
+                  <span style="font-size:12px;font-weight:700;color:#6ee7b7;text-transform:uppercase;">Полная независимость</span>
+                  <div class="flip-badge">✕</div>
+                </div>
+                <p style="margin:0;font-size:14px;color:#e2e8f0;">Вы получаете готовые файлы сайта. Можно разместить на бесплатном GitHub Pages или перенести на любой российский хостинг за 5 минут.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flip-card reveal stagger-3" onclick="this.classList.toggle('flipped')">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <svg class="card-3d-render" viewBox="0 0 160 160" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="prismTop" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#f0abfc" />
+                      <stop offset="50%" stop-color="#8b5cf6" />
+                      <stop offset="100%" stop-color="#4338ca" />
+                    </linearGradient>
+                    <linearGradient id="prismSide" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#60a5fa" />
+                      <stop offset="100%" stop-color="#1e3a8a" />
+                    </linearGradient>
+                  </defs>
+                  <rect x="34" y="84" width="22" height="44" rx="6" fill="url(#prismSide)" opacity="0.85" />
+                  <rect x="64" y="62" width="22" height="66" rx="6" fill="url(#prismSide)" />
+                  <rect x="94" y="34" width="26" height="94" rx="8" fill="url(#prismTop)" />
+                  <ellipse cx="107" cy="44" rx="9" ry="5" fill="rgba(255,255,255,0.45)" />
+                  <path d="M36 68 Q72 44 122 26" fill="none" stroke="#34d399" stroke-width="4" stroke-linecap="round" />
+                  <circle cx="122" cy="26" r="6" fill="#34d399" stroke="#fff" stroke-width="2" />
+                </svg>
+                <div class="flip-top">
+                  <div class="mini-photo-pill"><img src="assets/dev-workspace.jpg" alt="" /><span>Вовлечение</span></div>
+                  <div class="flip-badge">↻</div>
+                </div>
+                <div>
+                  <div class="monumental-num" data-count="2.4" data-suffix="×">2.4×</div>
+                  <div style="margin-top:8px;font-size:14px;color:var(--muted);">Выше вовлечённость за счёт калькуляторов цены, фильтров и живых сравнений.</div>
+                </div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="flip-top">
+                  <span style="font-size:12px;font-weight:700;color:#fbbf24;text-transform:uppercase;">Интерактив вместо шаблонов</span>
+                  <div class="flip-badge">✕</div>
+                </div>
+                <p style="margin:0;font-size:14px;color:#e2e8f0;">Посетитель сам просчитывает цену услуги или крутит слайдер «До / После» и оставляет тёплую заявку с уже выбранными параметрами.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow" class="workflow-section">
+      <div class="container workflow-layout">
+        <div class="workflow-sticky reveal">
+          <div class="band-eyebrow" style="color:#60a5fa;">Этапы реализации</div>
+          <h2 style="color:#fff;">Как проходит запуск проекта</h2>
+          <p class="section-desc" style="color:#94a3b8;">Спокойный поэтапный процесс в переписке без созвонов. Выберите шаг справа или просто листайте страницу.</p>
+          <div class="scrub-line dark"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-ghost" id="prevStepBtn" style="padding:11px 16px;">← Назад</button>
+            <button type="button" class="btn btn-accent" id="nextStepBtn" style="padding:11px 18px;">Следующий этап →</button>
+          </div>
+        </div>
+
+        <div class="focus-accordion reveal" id="focusAccordion">
+          <button type="button" class="focus-row active" data-step="0">
+            <div class="focus-head">
+              <div class="focus-title"><span class="focus-num">01</span> Бриф в переписке</div>
+              <span style="font-size:12px;color:#94a3b8;">15–30 минут</span>
+            </div>
+            <div class="focus-body">
+              <div><strong>Что нужно от вас</strong>Пара предложений о вашем деле, целевое действие и 1–2 примера сайтов.</div>
+              <div><strong>Результат этапа</strong>Фиксируем понятную структуру блоков, точную стоимость и срок запуска.</div>
+            </div>
+          </button>
+
+          <button type="button" class="focus-row" data-step="1">
+            <div class="focus-head">
+              <div class="focus-title"><span class="focus-num">02</span> Первый рабочий прототип</div>
+              <span style="font-size:12px;color:#94a3b8;">Через 24 часа</span>
+            </div>
+            <div class="focus-body">
+              <div><strong>Что нужно от вас</strong>Утвердить направление дизайна, палитру и акценты первого экрана.</div>
+              <div><strong>Результат этапа</strong>Получаете живую ссылку — смотрите реальный сайт в браузере, а не картинку.</div>
+            </div>
+          </button>
+
+          <button type="button" class="focus-row" data-step="2">
+            <div class="focus-head">
+              <div class="focus-title"><span class="focus-num">03</span> Интерактив, правки и адаптив</div>
+              <span style="font-size:12px;color:#94a3b8;">1–2 дня</span>
+            </div>
+            <div class="focus-body">
+              <div><strong>Что нужно от вас</strong>Пройтись по ссылке с телефона и ПК, прислать списком корректировки.</div>
+              <div><strong>Результат этапа</strong>Настроенные калькуляторы, 3D-блоки, анимации и отправка заявок в Telegram.</div>
+            </div>
+          </button>
+
+          <button type="button" class="focus-row" data-step="3">
+            <div class="focus-head">
+              <div class="focus-title"><span class="focus-num">04</span> Передача кода и публикация</div>
+              <span style="font-size:12px;color:#94a3b8;">Финал</span>
+            </div>
+            <div class="focus-body">
+              <div><strong>Что нужно от вас</strong>Принять финальную сборку и выбрать площадку для размещения.</div>
+              <div><strong>Результат этапа</strong>Чистый архив кода в вашей собственности и бесплатная помощь с запуском.</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="pricing-band">
+      <canvas class="section-ambient-canvas" id="pricingBgCanvas" aria-hidden="true"></canvas>
+      <div class="paper-grain" aria-hidden="true"></div>
+      <div class="container" style="position:relative; z-index:2;">
+        <div class="section-head-split reveal">
+          <div>
+            <div class="band-eyebrow" style="color:#a8b0bc;">Прозрачная стоимость</div>
+            <h2 style="color:#eff0f2;">Форматы работы и расчёт</h2>
+            <p class="section-desc" style="color:#9ba3b0;">Фиксированные условия без ежемесячной аренды конструктора — ниже можно сразу прикинуть бюджет проекта.</p>
+          </div>
+          <a href="https://t.me/DesAlexG" class="works-all-link tg-link" target="_blank" rel="noopener">Задать вопрос в Telegram ↗</a>
+        </div>
+
+        <div class="included-pills reveal">
+          <div class="inc-pill"><span style="color:#60a5fa;">✓</span> Адаптив под смартфоны</div>
+          <div class="inc-pill"><span style="color:#60a5fa;">✓</span> Заявки напрямую в Telegram</div>
+          <div class="inc-pill"><span style="color:#60a5fa;">✓</span> 0 ₽/мес за конструкторы</div>
+          <div class="inc-pill"><span style="color:#60a5fa;">✓</span> Чистые исходники в архиве</div>
+        </div>
+
+        <div class="pricing-grid">
+          <div class="price-card reveal stagger-1">
+            <div>
+              <div class="price-card-top"><span>01 · Быстрый запуск</span><span>↗</span></div>
+              <h3 style="margin:0; font-size:19px; color:#eff0f2;">Сайт-визитка / Мини-лендинг</h3>
+              <div class="price-sum" style="color:#eff0f2;">от 3 000 ₽</div>
+              <ul class="price-list">
+                <li>1–4 смысловых блока</li>
+                <li>Мобильная версия без перекосов</li>
+                <li>Форма заявки или переход в Telegram</li>
+                <li>Срок запуска: 1–2 дня</li>
+              </ul>
+            </div>
+            <a href="https://t.me/DesAlexG" class="btn-plan-dark tg-link" target="_blank" rel="noopener">Обсудить в чате →</a>
+          </div>
+
+          <div class="price-card accent reveal stagger-2">
+            <div>
+              <div class="price-card-top"><span>02 · Под ключ</span><span class="plan-badge">Популярный</span></div>
+              <h3 style="margin:0; font-size:19px; color:#141619;">Лендинг + интерактив</h3>
+              <div class="price-sum" style="color:#141619;">от 6 000 ₽</div>
+              <ul class="price-list">
+                <li>Структура под высокую конверсию</li>
+                <li>Калькулятор, квиз или фото-шоурум</li>
+                <li>Плавные анимации и высокая скорость</li>
+                <li>Помощь с публикацией бесплатно</li>
+              </ul>
+            </div>
+            <a href="https://t.me/DesAlexG" class="btn-plan-dark tg-link" target="_blank" rel="noopener">Заказать проект →</a>
+          </div>
+
+          <div class="price-card glass-alt reveal stagger-3">
+            <div>
+              <div class="price-card-top"><span>03 · Модернизация</span><span>Конструктор</span></div>
+              <h3 style="margin:0; font-size:19px; color:#eff0f2;">Правки / Редизайн сайта</h3>
+              <div class="price-sum" style="color:#eff0f2;">от 1 500 ₽</div>
+              <ul class="price-list">
+                <li>Исправление мобильной версии</li>
+                <li>Обновление первого экрана и УТП</li>
+                <li>Встраивание калькулятора или формы</li>
+                <li>Срок: от нескольких часов</li>
+              </ul>
+            </div>
+            <a href="https://t.me/DesAlexG" class="btn-plan-dark tg-link" target="_blank" rel="noopener">Прислать ссылку на сайт →</a>
+          </div>
+        </div>
+
+        <div class="estimator-card reveal">
+          <div>
+            <h3 style="margin:0 0 4px; font-size:20px; color:#eff0f2;">Быстрая оценка вашего проекта</h3>
+            <p style="margin:0; font-size:13px; color:#9ba3b0;">Выберите формат и нужные модули — кнопка справа откроет Telegram с готовым текстом.</p>
+
+            <div class="est-pills" id="estTypes">
+              <button type="button" class="est-pill active" data-base="3000" data-days="1–2 дня" data-label="Сайт-визитка">Сайт-визитка (от 3 000 ₽)</button>
+              <button type="button" class="est-pill" data-base="6000" data-days="2–3 дня" data-label="Лендинг под ключ">Лендинг под ключ (от 6 000 ₽)</button>
+              <button type="button" class="est-pill" data-base="8500" data-days="3–4 дня" data-label="Сайт-каталог">Каталог + шоурум (от 8 500 ₽)</button>
+            </div>
+
+            <div style="font-size:13px; font-weight:700; color:#cbd5e1; margin-bottom:8px;">Дополнительные модули:</div>
+            <div class="est-addons" id="estAddons">
+              <button type="button" class="addon-chip" data-add="1500" data-name="Калькулятор цены">+ Калькулятор цены</button>
+              <button type="button" class="addon-chip" data-add="1000" data-name="Заявки в Telegram">+ Заявки в Telegram</button>
+              <button type="button" class="addon-chip" data-add="1500" data-name="Написание текстов">+ Помощь с текстами</button>
+            </div>
+          </div>
+
+          <div class="est-result">
+            <div style="font-size:12px; color:#93c5fd; font-weight:700; text-transform:uppercase; letter-spacing:0.06em;">Ориентировочно</div>
+            <div id="estPriceOut" style="font-size:32px; font-weight:800; margin:6px 0 4px;">от 3 000 ₽</div>
+            <div id="estDaysOut" style="font-size:13px; color:#94a3b8; margin-bottom:18px;">Срок запуска: 1–2 дня</div>
+            <a id="estSendBtn" href="https://t.me/DesAlexG" target="_blank" rel="noopener" class="btn btn-accent" style="width:100%;">Отправить расчёт в Telegram</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section id="contact" class="cta-band">
+    <canvas id="finaleCanvas" aria-hidden="true"></canvas>
+    <div class="container" style="position:relative;z-index:3;">
+      <a href="https://t.me/DesAlexG" target="_blank" rel="noopener" class="pill-cta-bar tg-link reveal">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Быстрый старт в переписке</div>
+          <div style="font-size:clamp(20px,3vw,28px);font-weight:800;letter-spacing:-0.02em;">Обсудить ваш проект и получить первый прототип → <span id="tgHandleLabel">@DesAlexG</span></div>
+        </div>
+        <div class="pill-cta-arrow" aria-hidden="true">↗</div>
+      </a>
+
+      <footer class="footer-inner">
+        <div id="footerOwner">© 2026 · DesAlexG · Сайты и лендинги</div>
+        <div>Telegram для связи: <a href="https://t.me/DesAlexG" class="tg-link" style="color:#60a5fa;font-weight:700;" target="_blank" rel="noopener">https://t.me/DesAlexG</a></div>
+      </footer>
+    </div>
+  </section>
+
+  <script>
+    const OWNER_CONFIG = {
+      brandTitle: 'DesAlexG · Сайты и лендинги',
+      telegramUsername: 'DesAlexG'
+    };
+
+    document.getElementById('ownerNameBrand').textContent = OWNER_CONFIG.brandTitle;
+    document.getElementById('footerOwner').textContent = `© 2026 · ${OWNER_CONFIG.brandTitle}`;
+    document.getElementById('tgHandleLabel').textContent = '@' + OWNER_CONFIG.telegramUsername;
+
+    const tgBaseUrl = `https://t.me/${OWNER_CONFIG.telegramUsername}`;
+    document.querySelectorAll('.tg-link').forEach(a => {
+      if (!a.id || a.id !== 'estSendBtn') a.setAttribute('href', tgBaseUrl);
+    });
+
+    // === CONTAINED 3D ORBITAL PEARL RENDERER (Hero & Finale — Zero overlap!) ===
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pearlSize = 480;
+    const pearlCanvas = document.createElement('canvas');
+    pearlCanvas.width = pearlSize;
+    pearlCanvas.height = pearlSize;
+    const pctx = pearlCanvas.getContext('2d');
+
+    (function buildPearlSprite() {
+      const c = pearlSize / 2;
+      const r = pearlSize * 0.44;
+      const halo = pctx.createRadialGradient(c, c, r * 0.55, c, c, r * 1.15);
+      halo.addColorStop(0, 'rgba(59, 130, 246, 0.28)');
+      halo.addColorStop(0.6, 'rgba(139, 92, 246, 0.14)');
+      halo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      pctx.fillStyle = halo;
+      pctx.beginPath();
+      pctx.arc(c, c, r * 1.15, 0, Math.PI * 2);
+      pctx.fill();
+
+      pctx.save();
+      pctx.beginPath();
+      pctx.arc(c, c, r, 0, Math.PI * 2);
+      pctx.clip();
+
+      const base = pctx.createRadialGradient(c - r * 0.34, c - r * 0.36, r * 0.08, c + r * 0.15, c + r * 0.2, r * 1.15);
+      base.addColorStop(0, '#ffffff');
+      base.addColorStop(0.18, '#bfdbfe');
+      base.addColorStop(0.45, '#3b82f6');
+      base.addColorStop(0.74, '#4338ca');
+      base.addColorStop(0.92, '#1e1b4b');
+      base.addColorStop(1, '#090c14');
+      pctx.fillStyle = base;
+      pctx.fillRect(0, 0, pearlSize, pearlSize);
+
+      const rim1 = pctx.createRadialGradient(c + r * 0.48, c + r * 0.42, r * 0.05, c + r * 0.48, c + r * 0.42, r * 0.78);
+      rim1.addColorStop(0, 'rgba(16, 185, 129, 0.68)');
+      rim1.addColorStop(0.45, 'rgba(56, 189, 248, 0.35)');
+      rim1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      pctx.fillStyle = rim1;
+      pctx.fillRect(0, 0, pearlSize, pearlSize);
+
+      const rim2 = pctx.createRadialGradient(c - r * 0.52, c + r * 0.48, r * 0.04, c - r * 0.4, c + r * 0.4, r * 0.7);
+      rim2.addColorStop(0, 'rgba(244, 114, 182, 0.5)');
+      rim2.addColorStop(0.5, 'rgba(251, 191, 36, 0.18)');
+      rim2.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      pctx.fillStyle = rim2;
+      pctx.fillRect(0, 0, pearlSize, pearlSize);
+
+      const spec = pctx.createRadialGradient(c - r * 0.36, c - r * 0.38, 2, c - r * 0.36, c - r * 0.38, r * 0.35);
+      spec.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      spec.addColorStop(0.35, 'rgba(255, 255, 255, 0.35)');
+      spec.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      pctx.fillStyle = spec;
+      pctx.fillRect(0, 0, pearlSize, pearlSize);
+      pctx.restore();
+    })();
+
+    function draw3DRing(ctx, cx, cy, radius, tiltX, tiltY, rotZ, phase, isBack, dashed, color, label) {
+      const steps = 64;
+      ctx.save();
+      ctx.beginPath();
+      if (dashed) ctx.setLineDash([3, 7]);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = dashed ? 1.6 : 1.25;
+
+      let drawing = false;
+      for (let i = 0; i <= steps; i++) {
+        const a = (i / steps) * Math.PI * 2;
+        const x0 = Math.cos(a) * radius;
+        const y0 = Math.sin(a) * radius;
+        const x1 = x0 * Math.cos(rotZ) - y0 * Math.sin(rotZ);
+        const y1 = x0 * Math.sin(rotZ) + y0 * Math.cos(rotZ);
+        const y2 = y1 * Math.cos(tiltX);
+        const z2 = y1 * Math.sin(tiltX);
+        const x3 = x1 * Math.cos(tiltY) + z2 * Math.sin(tiltY);
+        const z3 = -x1 * Math.sin(tiltY) + z2 * Math.cos(tiltY);
+        const persp = 1 / (1 - (z3 / radius) * 0.14);
+        const px = cx + x3 * persp;
+        const py = cy + y2 * persp;
+        const onPass = isBack ? z3 < 0 : z3 >= 0;
+        if (onPass) {
+          if (!drawing) { ctx.moveTo(px, py); drawing = true; }
+          else ctx.lineTo(px, py);
+        } else {
+          drawing = false;
+        }
+      }
+      ctx.stroke();
+
+      if (!isBack && label) {
+        const x0 = Math.cos(phase) * radius;
+        const y0 = Math.sin(phase) * radius;
+        const x1 = x0 * Math.cos(rotZ) - y0 * Math.sin(rotZ);
+        const y1 = x0 * Math.sin(rotZ) + y0 * Math.cos(rotZ);
+        const y2 = y1 * Math.cos(tiltX);
+        const z2 = y1 * Math.sin(tiltX);
+        const x3 = x1 * Math.cos(tiltY) + z2 * Math.sin(tiltY);
+        const z3 = -x1 * Math.sin(tiltY) + z2 * Math.cos(tiltY);
+        if (z3 >= -radius * 0.15) {
+          const persp = 1 / (1 - (z3 / radius) * 0.14);
+          const mx = cx + x3 * persp;
+          const my = cy + y2 * persp;
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(mx, my, 4.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.font = '700 10px Manrope, sans-serif';
+          const tw = ctx.measureText(label).width;
+          ctx.fillStyle = 'rgba(9, 13, 24, 0.94)';
+          ctx.beginPath();
+          ctx.roundRect(mx + 9, my - 10, tw + 14, 20, 10);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(147, 197, 253, 0.48)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(label, mx + 16, my + 3.5);
+        }
+      }
+      ctx.restore();
+    }
+
+    const heroCanvas = document.getElementById('heroCanvas');
+    const hCtx = heroCanvas.getContext('2d');
+    const finaleCanvas = document.getElementById('finaleCanvas');
+    const fCtx = finaleCanvas.getContext('2d');
+    let hW = 0, hH = 0, fW = 0, fH = 0;
+
+    function resizeCanvases() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const hr = heroCanvas.parentElement.getBoundingClientRect();
+      hW = hr.width; hH = hr.height;
+      heroCanvas.width = hW * dpr; heroCanvas.height = hH * dpr;
+      hCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const fr = finaleCanvas.parentElement.getBoundingClientRect();
+      fW = fr.width; fH = fr.height;
+      finaleCanvas.width = fW * dpr; finaleCanvas.height = fH * dpr;
+      fCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeCanvases);
+    resizeCanvases();
+
+    let targetMx = 0, targetMy = 0, mx = 0, my = 0, dampedY = 0;
+    window.addEventListener('pointermove', (e) => {
+      targetMx = (e.clientX / window.innerWidth - 0.5) * 2;
+      targetMy = (e.clientY / window.innerHeight - 0.5) * 2;
+    }, { passive: true });
+
+    function drawOrbScene(ctx, w, h, cx, cy, radius, t, showLabels) {
+      ctx.clearRect(0, 0, w, h);
+      draw3DRing(ctx, cx, cy, radius * 1.38, 1.12 + my * 0.14, -0.28 + mx * 0.16, t * 0.18, t * 0.65, true, true, 'rgba(147, 197, 253, 0.52)', null);
+      draw3DRing(ctx, cx, cy, radius * 1.62, 0.96 - my * 0.12, 0.42 + mx * 0.14, -t * 0.12, -t * 0.5 + 2.4, true, false, 'rgba(110, 231, 183, 0.4)', null);
+
+      const sz = radius * 2.25;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(Math.sin(t * 0.45) * 0.06 + mx * 0.05);
+      ctx.drawImage(pearlCanvas, -sz / 2, -sz / 2, sz, sz);
+      ctx.restore();
+
+      draw3DRing(ctx, cx, cy, radius * 1.38, 1.12 + my * 0.14, -0.28 + mx * 0.16, t * 0.18, t * 0.65, false, true, 'rgba(147, 197, 253, 0.85)', showLabels ? 'ИДЕЯ' : null);
+      draw3DRing(ctx, cx, cy, radius * 1.62, 0.96 - my * 0.12, 0.42 + mx * 0.14, -t * 0.12, -t * 0.5 + 2.4, false, false, 'rgba(110, 231, 183, 0.72)', showLabels ? 'ФОРМА' : null);
+    }
+
+    function animateFrame(now) {
+      const t = now * 0.001;
+      mx += (targetMx - mx) * 0.08;
+      my += (targetMy - my) * 0.08;
+      dampedY += (window.scrollY - dampedY) * 0.14;
+
+      // Drift Hero lines cleanly on scroll
+      document.querySelectorAll('.drift-line').forEach(line => {
+        const factor = Number(line.dataset.drift || 0);
+        const shift = dampedY * factor * 1.3;
+        const fade = Math.max(0.2, 1 - dampedY / (hH * 0.9));
+        line.style.transform = `translate3d(${shift.toFixed(1)}px, 0, 0)`;
+        line.style.opacity = fade.toFixed(3);
+      });
+
+      // Draw Hero 3D Pearl purely inside #heroCanvas
+      if (dampedY < hH + 120) {
+        const isDesktop = hW >= 980;
+        const cx = (isDesktop ? hW * 0.72 : hW * 0.82) + mx * 18;
+        const cy = (isDesktop ? hH * 0.42 : hH * 0.14) + my * 12 + Math.sin(t * 1.4) * 6 - dampedY * 0.12;
+        const rad = (isDesktop ? Math.min(hW, hH) * 0.23 : 68) * (0.96 + Math.sin(t * 1.6) * 0.03);
+        drawOrbScene(hCtx, hW, hH, cx, cy, rad, t, isDesktop);
+      }
+
+      // Draw Finale 3D Pearl purely inside #finaleCanvas
+      if (dampedY + window.innerHeight > document.body.scrollHeight - fH - 180) {
+        const fCx = fW * 0.8 + mx * 12;
+        const fCy = fH * 0.45 + my * 8 + Math.sin(t * 1.2) * 5;
+        drawOrbScene(fCtx, fW, fH, fCx, fCy, Math.min(fW, fH) * 0.42, t, false);
+      }
+
+      // Draw sparse geometric doodles inside #cases & #pricing
+      paintAmbientDoodles(worksBgCanvas, wCtx, wW, wH, t);
+      paintAmbientDoodles(pricingBgCanvas, pBgCtx, pBgW, pBgH, t + 4);
+
+      if (!reducedMotion) requestAnimationFrame(animateFrame);
+    }
+
+    // Section-scoped sparse sparkles & tilted ovals (inspired by host-ai.site/ru)
+    const worksBgCanvas = document.getElementById('worksBgCanvas');
+    const pricingBgCanvas = document.getElementById('pricingBgCanvas');
+    const wCtx = worksBgCanvas ? worksBgCanvas.getContext('2d') : null;
+    const pBgCtx = pricingBgCanvas ? pricingBgCanvas.getContext('2d') : null;
+    let wW = 0, wH = 0, pBgW = 0, pBgH = 0;
+
+    function syncSectionCanvases() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (worksBgCanvas) {
+        const r = worksBgCanvas.parentElement.getBoundingClientRect();
+        wW = r.width; wH = r.height;
+        worksBgCanvas.width = wW * dpr; worksBgCanvas.height = wH * dpr;
+        wCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      if (pricingBgCanvas) {
+        const r = pricingBgCanvas.parentElement.getBoundingClientRect();
+        pBgW = r.width; pBgH = r.height;
+        pricingBgCanvas.width = pBgW * dpr; pricingBgCanvas.height = pBgH * dpr;
+        pBgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+    }
+    window.addEventListener('resize', syncSectionCanvases);
+    syncSectionCanvases();
+
+    const ambientSeeds = [
+      { x: 0.04, y: 0.24, type: 'oval', r: 16, rot: -0.4, speed: 0.45, color: 'rgba(168,176,188,0.18)' },
+      { x: 0.96, y: 0.22, type: 'star', r: 15, rot: 0.15, speed: -0.35, color: 'rgba(168,176,188,0.22)' },
+      { x: 0.03, y: 0.52, type: 'star', r: 22, rot: 0.2, speed: 0.28, color: 'rgba(139,92,246,0.26)' },
+      { x: 0.96, y: 0.56, type: 'oval', r: 13, rot: 0.55, speed: -0.4, color: 'rgba(168,176,188,0.16)' },
+      { x: 0.06, y: 0.82, type: 'oval', r: 11, rot: -0.3, speed: 0.35, color: 'rgba(96,165,250,0.22)' },
+      { x: 0.94, y: 0.85, type: 'star', r: 18, rot: -0.1, speed: -0.3, color: 'rgba(240,107,168,0.2)' }
+    ];
+
+    function paintAmbientDoodles(canvas, ctx, w, h, t) {
+      if (!canvas || !ctx || !w || !h) return;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.bottom < -120 || rect.top > window.innerHeight + 120) return;
+      ctx.clearRect(0, 0, w, h);
+      ambientSeeds.forEach((s, i) => {
+        const px = s.x * w + Math.sin(t * 0.6 + i) * 6;
+        const py = s.y * h + Math.cos(t * 0.5 + i * 2) * 8;
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(s.rot + Math.sin(t * s.speed + i) * 0.14);
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        if (s.type === 'oval') {
+          ctx.ellipse(0, 0, s.r, s.r * 0.56, 0, 0, Math.PI * 2);
+        } else {
+          const r = s.r;
+          const q = r * 0.22;
+          ctx.moveTo(0, -r);
+          ctx.quadraticCurveTo(q, -q, r, 0);
+          ctx.quadraticCurveTo(q, q, 0, r);
+          ctx.quadraticCurveTo(-q, q, -r, 0);
+          ctx.quadraticCurveTo(-q, -q, 0, -r);
+        }
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    // Opposing scroll parallax drift on #cases asymmetric browser cards
+    const casesSectionEl = document.getElementById('cases');
+    function updateGalleryDrift() {
+      if (!casesSectionEl || reducedMotion || window.innerWidth <= 740) return;
+      const r = casesSectionEl.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      const centerOffset = (r.top + r.height * 0.5 - vh * 0.5) / vh;
+      const clamped = Math.max(-1.2, Math.min(1.2, centerOffset));
+      casesSectionEl.style.setProperty('--gallery-drift', (clamped * 38).toFixed(2) + 'px');
+    }
+    window.addEventListener('scroll', updateGalleryDrift, { passive: true });
+    window.addEventListener('resize', updateGalleryDrift);
+    updateGalleryDrift();
+
+    // Scale live real-site iframes proportionally to 1366px desktop width
+    function scaleWorkIframes() {
+      document.querySelectorAll('.work-viewport').forEach((vp) => {
+        const ifr = vp.querySelector('.work-iframe');
+        if (!ifr) return;
+        const w = vp.clientWidth;
+        const h = vp.clientHeight;
+        if (!w || !h) return;
+        const baseW = 1366;
+        const scale = w / baseW;
+        ifr.style.width = baseW + 'px';
+        ifr.style.height = Math.ceil(h / scale) + 'px';
+        ifr.style.transform = `scale(${scale.toFixed(6)})`;
+      });
+    }
+    scaleWorkIframes();
+    window.addEventListener('resize', scaleWorkIframes);
+    if ('ResizeObserver' in window) {
+      const casesGridEl = document.getElementById('casesGrid');
+      if (casesGridEl) new ResizeObserver(scaleWorkIframes).observe(casesGridEl);
+    }
+
+    if (!reducedMotion) requestAnimationFrame(animateFrame);
+    else animateFrame(0);
+
+    // Hero Dock Spotlight
+    const heroDock = document.getElementById('heroDock');
+    if (heroDock && !reducedMotion) {
+      heroDock.addEventListener('pointermove', (e) => {
+        const r = heroDock.getBoundingClientRect();
+        heroDock.style.setProperty('--mx', ((e.clientX - r.left) / r.width) * 100 + '%');
+        heroDock.style.setProperty('--my', ((e.clientY - r.top) / r.height) * 100 + '%');
+      });
+    }
+
+    // Scroll Progress & Workflow scroll-sync
+    let manualStepLock = false;
+    let activeStep = 0;
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100;
+      document.getElementById('scrollProgress').style.width = pct + '%';
+
+      if (!manualStepLock) {
+        const wf = document.getElementById('workflow');
+        const rect = wf.getBoundingClientRect();
+        const vh = window.innerHeight;
+        if (rect.top < vh * 0.55 && rect.bottom > vh * 0.3) {
+          const progress = Math.max(0, Math.min(0.99, (vh * 0.55 - rect.top) / (rect.height * 0.65)));
+          const autoIdx = Math.floor(progress * 4);
+          if (autoIdx !== activeStep) setWorkflowStep(autoIdx, false);
+        }
+      }
+    }, { passive: true });
+
+    // Count-up animation
+    function animateCount(el) {
+      if (el.dataset.counted) return;
+      el.dataset.counted = '1';
+      const raw = el.dataset.count;
+      const isFloat = raw.includes('.');
+      const target = Number(raw);
+      const suffix = el.dataset.suffix || '';
+      const dur = 1150;
+      const start = performance.now();
+      function tick(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const val = target * eased;
+        el.textContent = (isFloat ? val.toFixed(1) : Math.round(val).toLocaleString('ru-RU')) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    const revealEls = document.querySelectorAll('.reveal, .scrub-line, [data-count]');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (entry.target.classList.contains('reveal') || entry.target.classList.contains('scrub-line')) {
+              entry.target.classList.add('visible');
+            }
+            if (entry.target.hasAttribute('data-count')) animateCount(entry.target);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealEls.forEach(el => io.observe(el));
+    } else {
+      revealEls.forEach(el => {
+        el.classList.add('visible');
+        if (el.hasAttribute('data-count')) animateCount(el);
+      });
+    }
+
+    // Focus Accordion
+    function setWorkflowStep(idx, fromUser = true) {
+      if (fromUser) manualStepLock = true;
+      activeStep = Math.max(0, Math.min(3, idx));
+      document.querySelectorAll('#focusAccordion .focus-row').forEach(row => {
+        row.classList.toggle('active', Number(row.dataset.step) === activeStep);
+      });
+      document.getElementById('prevStepBtn').disabled = activeStep === 0;
+      document.getElementById('prevStepBtn').style.opacity = activeStep === 0 ? '0.45' : '1';
+      document.getElementById('nextStepBtn').textContent = activeStep === 3 ? 'Обсудить старт →' : 'Следующий этап →';
+    }
+    document.querySelectorAll('#focusAccordion .focus-row').forEach(row => {
+      row.addEventListener('click', () => setWorkflowStep(Number(row.dataset.step), true));
+    });
+    document.getElementById('prevStepBtn').addEventListener('click', () => setWorkflowStep(activeStep - 1, true));
+    document.getElementById('nextStepBtn').addEventListener('click', () => {
+      if (activeStep === 3) window.open(tgBaseUrl, '_blank', 'noopener');
+      else setWorkflowStep(activeStep + 1, true);
+    });
+    setWorkflowStep(0, false);
+
+    // Interactive Pricing Estimator
+    const estState = { base: 3000, days: '1–2 дня', label: 'Сайт-визитка', addons: [] };
+    function updateEstimator() {
+      let total = estState.base;
+      estState.addons.forEach(a => total += a.price);
+      document.getElementById('estPriceOut').textContent = `от ${total.toLocaleString('ru-RU')} ₽`;
+      document.getElementById('estDaysOut').textContent = `Срок запуска: ${estState.days}`;
+      const addonNames = estState.addons.length ? estState.addons.map(a => a.name).join(', ') : 'без доп. модулей';
+      const msg = `Привет! Нужен ${estState.label} (${addonNames}). Ориентир по калькулятору: от ${total.toLocaleString('ru-RU')} ₽.`;
+      document.getElementById('estSendBtn').href = `${tgBaseUrl}?text=${encodeURIComponent(msg)}`;
+    }
+    document.querySelectorAll('.est-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.est-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        estState.base = Number(btn.dataset.base);
+        estState.days = btn.dataset.days;
+        estState.label = btn.dataset.label;
+        updateEstimator();
+      });
+    });
+    document.querySelectorAll('.addon-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('active');
+        const name = chip.dataset.name;
+        const price = Number(chip.dataset.add);
+        if (chip.classList.contains('active')) estState.addons.push({ name, price });
+        else estState.addons = estState.addons.filter(a => a.name !== name);
+        updateEstimator();
+      });
+    });
+    updateEstimator();
+
+    document.getElementById('burgerBtn').addEventListener('click', () => {
+      document.getElementById('mainNav').classList.toggle('open');
+    });
+  </script>
+</body>
+</html>

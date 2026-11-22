@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLACKLINE — Детейлинг-студия и защита кузова</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0c0f;
+      --surface: #13151b;
+      --surface-elevated: #1a1d25;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(229, 169, 60, 0.45);
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #e5a93c;
+      --accent-hover: #f2bb52;
+      --accent-soft: rgba(229, 169, 60, 0.12);
+      --radius: 16px;
+      --container: 1180px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select { font-family: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .container {
+      width: min(100% - 32px, var(--container));
+      margin-inline: auto;
+    }
+
+    /* Top Scroll Progress */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #e5a93c, #fde68a);
+      z-index: 120;
+    }
+
+    /* Scroll Reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px) scale(0.98);
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .scrub-line {
+      height: 1px;
+      width: 28%;
+      background: linear-gradient(90deg, var(--accent), rgba(255, 255, 255, 0.08));
+      margin: 14px 0 32px;
+      transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .scrub-line.visible { width: 100%; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .scrub-line { opacity: 1; transform: none; width: 100%; transition: none; }
+      .ticker-track { animation: none !important; }
+    }
+
+    /* Portfolio Back Bar */
+    .demo-bar {
+      background: #07080a;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--muted);
+      padding: 8px 0;
+    }
+    .demo-bar-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent);
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover { opacity: 0.82; }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(11, 12, 15, 0.86);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+      gap: 24px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+    }
+    .logo-mark {
+      width: 10px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 3px;
+      transform: skewX(-16deg);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .nav a:hover { color: var(--text); }
+    .header-actions { display: flex; align-items: center; gap: 14px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 22px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+    .btn-primary { background: var(--accent); color: #111; }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(229, 169, 60, 0.28);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .burger {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Parallax Hero */
+    .hero {
+      position: relative;
+      min-height: 640px;
+      display: flex;
+      align-items: center;
+      padding: 72px 0;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-bg {
+      position: absolute;
+      inset: -30px 0 0 0;
+      background: url('../../assets/detailing-hero.jpg') center right / cover no-repeat;
+      transform: scale(1.05);
+      will-change: transform;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, #0b0c0f 0%, rgba(11, 12, 15, 0.92) 45%, rgba(11, 12, 15, 0.35) 100%);
+    }
+    .hero-content { position: relative; z-index: 2; max-width: 620px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--border-strong);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-size: clamp(32px, 5vw, 54px);
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .hero p { margin: 0 0 28px; font-size: 17px; color: #d1d5db; max-width: 520px; }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 38px; }
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      padding-top: 26px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .stat-num { font-size: 26px; font-weight: 800; color: var(--text); }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* Marquee Ticker */
+    .ticker {
+      background: var(--accent);
+      color: #111;
+      overflow: hidden;
+      padding: 10px 0;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .ticker-track {
+      display: inline-flex;
+      gap: 32px;
+      animation: tickerMove 24s linear infinite;
+    }
+    @keyframes tickerMove {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* Sections */
+    section { padding: 76px 0; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+    h2 {
+      margin: 0;
+      font-size: clamp(26px, 3.6vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .section-sub { color: var(--muted); margin: 8px 0 0; max-width: 540px; font-size: 15px; }
+
+    /* Material Technologies Cards with Real Photography */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      margin-bottom: 18px;
+    }
+    .tech-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .tech-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+    .tech-photo-wrap {
+      position: relative;
+      height: 210px;
+      overflow: hidden;
+      background: #0b0c0f;
+    }
+    .tech-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .tech-card:hover .tech-photo-wrap img { transform: scale(1.06); }
+    .tech-badge {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      background: rgba(11, 12, 15, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-strong);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .tech-body { padding: 22px; }
+
+    /* Interactive Car Zone Configurator over Real Studio Car Photo */
+    .zone-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .zone-layout {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 32px;
+      align-items: center;
+    }
+    .car-stage {
+      background: #0b0c0f;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      position: relative;
+    }
+    .car-hotspot-box {
+      position: relative;
+      border-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+    }
+    .car-hotspot-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.86) contrast(1.06);
+    }
+    .hotspot-pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px 5px 6px;
+      border-radius: 999px;
+      background: rgba(11, 12, 15, 0.84);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      color: #f3f4f6;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      z-index: 3;
+      white-space: nowrap;
+    }
+    .hotspot-pin:hover { border-color: var(--accent); transform: translate(-50%, -50%) scale(1.06); }
+    .hotspot-pin.active {
+      background: var(--accent);
+      color: #111;
+      border-color: #fef3c7;
+      box-shadow: 0 0 0 6px rgba(229, 169, 60, 0.28);
+    }
+    .pin-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.16);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .hotspot-pin.active .pin-dot { background: #111; color: var(--accent); }
+    .zone-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+      justify-content: center;
+    }
+    .zone-pill {
+      padding: 8px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .zone-pill.active {
+      background: var(--accent);
+      color: #111;
+      border-color: var(--accent);
+    }
+    .zone-summary {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+    }
+    .armor-bar-track {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      margin: 10px 0 20px;
+    }
+    .armor-bar-fill {
+      height: 100%;
+      width: 45%;
+      background: linear-gradient(90deg, #e5a93c, #fef08a);
+      border-radius: 999px;
+      transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .zone-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 22px;
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      color: #d1d5db;
+    }
+    .zone-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+    }
+    .svg-zone {
+      cursor: pointer;
+      transition: fill 0.25s, stroke 0.25s, opacity 0.25s;
+    }
+
+    /* Class Switcher */
+    .class-switcher {
+      display: inline-flex;
+      background: var(--surface);
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .class-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .class-btn.active { background: var(--accent); color: #111; }
+
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+    .service-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .service-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    }
+    .service-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .service-card h3 { margin: 0 0 10px; font-size: 20px; font-weight: 700; }
+    .service-card p { margin: 0 0 22px; font-size: 14px; color: var(--muted); }
+    .service-meta {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .price-val { font-size: 22px; font-weight: 800; color: var(--text); }
+    .price-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    /* Photorealistic Before / After Comparison */
+    .compare-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .compare-layout {
+      display: grid;
+      grid-template-columns: 0.92fr 1.28fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .compare-box {
+      position: relative;
+      height: 390px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      user-select: none;
+      background: #0b0c0f;
+      box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55);
+    }
+    .compare-layer { position: absolute; inset: 0; }
+    .compare-after img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .compare-before {
+      width: 50%;
+      overflow: hidden;
+      border-right: 2px solid var(--accent);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.6);
+    }
+    .compare-before-inner { position: relative; height: 100%; }
+    .compare-before-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: brightness(0.95) contrast(0.72) saturate(0.45) blur(0.6px);
+    }
+    .swirl-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.72;
+      background:
+        radial-gradient(circle at 46% 52%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 22%, transparent 48%),
+        repeating-radial-gradient(circle at 46% 52%, rgba(255,255,255,0.12) 0px, transparent 2px, transparent 7px),
+        repeating-radial-gradient(circle at 30% 66%, rgba(255,255,255,0.09) 0px, transparent 1.5px, transparent 9px);
+    }
+    .compare-badge {
+      position: absolute;
+      top: 16px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(11, 12, 15, 0.84);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.16);
+      z-index: 4;
+    }
+    .badge-left { left: 16px; color: #fca5a5; }
+    .badge-right { right: 16px; color: #86efac; }
+    .compare-caption-bottom {
+      position: absolute;
+      bottom: 14px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+      pointer-events: none;
+      z-index: 4;
+    }
+    .compare-caption-bottom span {
+      background: rgba(11, 12, 15, 0.78);
+      backdrop-filter: blur(6px);
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .compare-range {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: ew-resize;
+      z-index: 6;
+      margin: 0;
+    }
+    .compare-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #111;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.65);
+      z-index: 5;
+      pointer-events: none;
+    }
+    .feature-list { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 14px; }
+    .feature-list li { display: flex; gap: 12px; align-items: flex-start; color: #d1d5db; font-size: 15px; }
+    .check-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Process */
+    .steps-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: transform 0.25s, border-color 0.25s;
+    }
+    .step-card:hover { transform: translateY(-3px); border-color: var(--border-strong); }
+    .step-num { font-size: 13px; font-weight: 800; color: var(--accent); margin-bottom: 12px; }
+    .step-card h4 { margin: 0 0 8px; font-size: 17px; }
+    .step-card p { margin: 0; font-size: 14px; color: var(--muted); }
+
+    /* Footer */
+    .footer { border-top: 1px solid var(--border); padding: 40px 0; color: var(--muted); font-size: 14px; }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(6px);
+      display: none;
+      place-items: center;
+      padding: 16px;
+      z-index: 100;
+    }
+    .modal-backdrop.open { display: grid; }
+    .modal {
+      width: min(100%, 460px);
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      color: var(--text);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    .field input, .field select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+    }
+    .form-success {
+      display: none;
+      padding: 18px;
+      border-radius: 12px;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      color: #bbf7d0;
+      font-size: 14px;
+    }
+
+    @media (max-width: 960px) {
+      .services-grid, .tech-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .compare-layout, .zone-layout { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-overlay { background: linear-gradient(180deg, rgba(11, 12, 15, 0.86) 0%, #0b0c0f 100%); }
+    }
+    @media (max-width: 680px) {
+      .nav, .header-cta-desktop { display: none; }
+      .burger { display: inline-flex; }
+      .nav.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 74px;
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .services-grid, .tech-grid, .steps-grid, .hero-stats { grid-template-columns: 1fr; }
+      .compare-box { height: 300px; }
+      .compare-badge {
+        font-size: 10px;
+        line-height: 1.25;
+        padding: 5px 8px;
+        max-width: calc(50% - 14px);
+        top: 10px;
+        text-align: center;
+      }
+      .badge-left { left: 10px; }
+      .badge-right { right: 10px; }
+      .hotspot-pin { font-size: 10px; padding: 4px 8px 4px 5px; gap: 4px; }
+      .pin-dot { width: 13px; height: 13px; font-size: 9px; }
+    }
+    html.in-preview { scroll-behavior: auto !important; overflow: hidden !important; height: 100% !important; }
+    html.in-preview body { overflow: hidden !important; height: 100% !important; }
+    html.in-preview .demo-bar, html.in-preview .scroll-progress { display: none !important; }
+    html.in-preview .reveal, html.in-preview .scrub-line { opacity: 1 !important; transform: none !important; width: 100% !important; transition: none !important; }
+  </style>
+  <script>if (window.self !== window.top || location.search.indexOf('preview=1') !== -1) { document.documentElement.classList.add('in-preview'); window.scrollTo(0, 0); window.addEventListener('scroll', function () { if (window.scrollY) window.scrollTo(0, 0); }); }</script>
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <div class="demo-bar">
+    <div class="container demo-bar-inner">
+      <a class="back-link" href="../../index.html">← Назад в портфолио</a>
+      <span>Кейс #1 · Заказать такой сайт: <a href="https://t.me/DesAlexG" target="_blank" rel="noopener" class="back-link">@DesAlexG</a></span>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">
+        <span class="logo-mark"></span>
+        BLACKLINE
+      </a>
+      <nav class="nav" id="mainNav">
+        <a href="#zones">Схема защиты</a>
+        <a href="#services">Прайс</a>
+        <a href="#compare">До и После</a>
+        <a href="#process">Этапы</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-primary header-cta-desktop" onclick="openBooking('Консультация')">Записаться в бокс</button>
+        <button class="burger" id="burgerBtn" aria-label="Меню">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
+      <div class="hero-overlay" aria-hidden="true"></div>
+      <div class="container">
+        <div class="hero-content">
+          <div class="eyebrow">Студия детейлинга · Гарантия 3 года</div>
+          <h1>Защита кузова и зеркальный блеск нового автомобиля</h1>
+          <p>Оклейка полиуретановой плёнкой, многоэтапная полировка, керамика и глубокая химчистка салона с фотоотчётом каждого этапа.</p>
+          <div class="hero-cta">
+            <a href="#zones" class="btn btn-primary">Собрать пакет защиты</a>
+            <a href="#services" class="btn btn-outline">Смотреть прайс по классу авто</a>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <div class="stat-num" data-count="1400" data-suffix="+">1 400+</div>
+              <div class="stat-label">автомобилей защищено</div>
+            </div>
+            <div>
+              <div class="stat-num" data-count="200" data-suffix=" мкм">200 мкм</div>
+              <div class="stat-label">полиуретан без жёлтизны</div>
+            </div>
+            <div>
+              <div class="stat-num">от 1 дня</div>
+              <div class="stat-label">точный срок в договоре</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>★ Оклейка полиуретаном 200 мкм</span>
+        <span>★ 2-слойная керамика 9H</span>
+        <span>★ Контроль толщины ЛКП в 40 точках</span>
+        <span>★ Фотоотчёт каждого этапа в Telegram</span>
+        <span>★ Гарантия до 5 лет в договоре</span>
+        <span>★ Оклейка полиуретаном 200 мкм</span>
+        <span>★ 2-слойная керамика 9H</span>
+        <span>★ Контроль толщины ЛКП в 40 точках</span>
+        <span>★ Фотоотчёт каждого этапа в Telegram</span>
+        <span>★ Гарантия до 5 лет в договоре</span>
+      </div>
+    </div>
+
+    <section>
+      <div class="container">
+        <div class="reveal">
+          <h2>Материалы и контроль качества</h2>
+          <p class="section-sub">Работаем сертифицированной химией и плёнками — без экономии на толщине слоя и подготовке лака.</p>
+        </div>
+        <div class="scrub-line"></div>
+
+        <div class="tech-grid">
+          <article class="tech-card reveal">
+            <div class="tech-photo-wrap">
+              <img src="../../assets/det-hydro.jpg" alt="Гидрофобный эффект защитного покрытия и полиуретана" />
+              <span class="tech-badge">Полиуретан 200 мкм</span>
+            </div>
+            <div class="tech-body">
+              <h3 style="margin:0 0 8px;">Антигравийная плёнка + гидрофоб</h3>
+              <p style="margin:0;font-size:14px;color:var(--muted);">Самовосстанавливающийся верхний слой затягивает мелкие царапины от тепла и отталкивает реагенты.</p>
+            </div>
+          </article>
+
+          <article class="tech-card reveal">
+            <div class="tech-photo-wrap">
+              <img src="../../assets/det-ceramic.jpg" alt="Ручное нанесение керамического состава на кузов" />
+              <span class="tech-badge">Керамика 9H · 2 слоя</span>
+            </div>
+            <div class="tech-body">
+              <h3 style="margin:0 0 8px;">Нанокерамика 9H</h3>
+              <p style="margin:0;font-size:14px;color:var(--muted);">Создаёт глубокий леденцовый блеск, блокирует выгорание цвета на солнце и облегчает мойку.</p>
+            </div>
+          </article>
+
+          <article class="tech-card reveal">
+            <div class="tech-photo-wrap">
+              <img src="../../assets/det-gloss.jpg" alt="Зеркальный глянец кузова и защита дисков" />
+              <span class="tech-badge">Толщиномер · 40 точек</span>
+            </div>
+            <div class="tech-body">
+              <h3 style="margin:0 0 8px;">Безопасная полировка и диски</h3>
+              <p style="margin:0;font-size:14px;color:var(--muted);">Снимаем минимальные 2–4 микрона лака на машинках Rupes и защищаем литые диски термостойким составом.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="zones" class="zone-section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2>Интерактивная схема зон защиты</h2>
+            <p class="section-sub">Нажмите на точки прямо на автомобиле или кнопки снизу — соберём ваш индивидуальный набор оклейки с расчётом под выбранный класс.</p>
+          </div>
+        </div>
+
+        <div class="zone-layout reveal">
+          <div class="car-stage">
+            <div class="car-hotspot-box" id="carHotspotBox">
+              <img src="../../assets/detailing-hero.jpg" alt="Схема зон оклейки кузова автомобиля" />
+              <div id="hotspotsLayer"></div>
+            </div>
+            <div class="zone-pills" id="zonePills"></div>
+          </div>
+
+          <div class="zone-summary">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;">Уровень брони кузова</span>
+              <strong id="armorPct">60%</strong>
+            </div>
+            <div class="armor-bar-track"><div class="armor-bar-fill" id="armorFill"></div></div>
+
+            <ul class="zone-list" id="zoneList"></ul>
+
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;">
+              <div>
+                <div style="font-size:12px;color:var(--muted);">Итого по выбранным зонам:</div>
+                <div id="zoneTotal" style="font-size:28px;font-weight:800;">52 000 ₽</div>
+              </div>
+              <span id="zoneClassBadge" style="font-size:12px;color:var(--accent);font-weight:700;">Седан / Купе</span>
+            </div>
+            <button class="btn btn-primary" style="width:100%;" id="zoneBookBtn">Записаться на этот набор</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2>Услуги и точный прайс</h2>
+            <p class="section-sub">Выберите класс вашего автомобиля — цены обновятся мгновенно, без скрытых доплат на приёмке.</p>
+          </div>
+          <div class="class-switcher" role="group" aria-label="Класс автомобиля">
+            <button class="class-btn active" data-class="sedan">Седан / Купе</button>
+            <button class="class-btn" data-class="crossover">Кроссовер</button>
+            <button class="class-btn" data-class="suv">Внедорожник</button>
+          </div>
+        </div>
+
+        <div class="services-grid" id="servicesGrid"></div>
+      </div>
+    </section>
+
+    <section id="compare" class="compare-section">
+      <div class="container compare-layout">
+        <div class="reveal">
+          <h2>Наглядный результат до и после</h2>
+          <p class="section-sub">Потяните ползунок прямо по капоту и крылу, чтобы увидеть разницу между «паутинкой» от обычных моек и зеркальной глубиной после полировки + керамики.</p>
+          <ul class="feature-list">
+            <li><span class="check-dot">✓</span>Убираем до 95% «паутинки», матовости и голограмм</li>
+            <li><span class="check-dot">✓</span>Гидрофобный слой 9H: вода и реагенты скатываются сами</li>
+            <li><span class="check-dot">✓</span>Измеряем толщину ЛКП в 40 точках до начала работ</li>
+          </ul>
+        </div>
+
+        <div class="compare-box reveal" id="compareBox">
+          <div class="compare-layer compare-after">
+            <img src="../../assets/paint-after.jpg" alt="Кузов после полировки и керамического покрытия" />
+          </div>
+          <div class="compare-layer compare-before" id="compareBefore">
+            <div class="compare-before-inner" id="compareBeforeInner">
+              <img src="../../assets/paint-after.jpg" alt="Лак с паутинкой и матовым налётом до полировки" />
+              <div class="swirl-overlay" aria-hidden="true">
+                <svg width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="none">
+                  <g stroke="rgba(255,255,255,0.28)" stroke-width="0.9" fill="none">
+                    <path d="M210 210 C 260 155, 360 140, 420 190" />
+                    <path d="M240 245 C 310 190, 390 210, 450 250" />
+                    <path d="M180 275 C 250 240, 330 270, 400 245" />
+                    <path d="M280 165 C 340 135, 410 155, 465 185" />
+                    <circle cx="330" cy="220" r="54" stroke-dasharray="18 11" />
+                    <circle cx="330" cy="220" r="36" stroke-dasharray="12 9" />
+                    <circle cx="430" cy="260" r="42" stroke-dasharray="15 10" />
+                    <circle cx="240" cy="290" r="32" stroke-dasharray="10 8" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <span class="compare-badge badge-left">ДО · Паутинка и тусклый лак</span>
+          <span class="compare-badge badge-right">ПОСЛЕ · Зеркальная керамика 9H</span>
+          <div class="compare-caption-bottom">
+            <span>Свет инспекции: выявлены микроцарапины</span>
+            <span>Глянец 98 GU · глубокий цвет</span>
+          </div>
+          <div class="compare-handle" id="compareHandle">⇄</div>
+          <input type="range" min="8" max="92" value="50" class="compare-range" id="compareRange" aria-label="Сравнение до и после" />
+        </div>
+      </div>
+    </section>
+
+    <section id="process">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2>Как проходит работа</h2>
+            <p class="section-sub">Прозрачный процесс без навязанных доплат — принимаете авто при ярком детейлинг-свете.</p>
+          </div>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card reveal">
+            <div class="step-num">01 / ОСМОТР</div>
+            <h4>Диагностика ЛКП</h4>
+            <p>Оцениваем сколы, толщину лака и подбираем оптимальный пакет защиты под ваш бюджет.</p>
+          </div>
+          <div class="step-card reveal">
+            <div class="step-num">02 / ПОДГОТОВКА</div>
+            <h4>Двухфазная мойка</h4>
+            <p>Очищаем кузов от битума, металлических вкраплений и подготавливаем бокс с контролем пыли.</p>
+          </div>
+          <div class="step-card reveal">
+            <div class="step-num">03 / РАБОТА</div>
+            <h4>Оклейка или керамика</h4>
+            <p>Выполняем работы по лекалам без порезов по лаку, присылаем фотоотчёт в мессенджер.</p>
+          </div>
+          <div class="step-card reveal">
+            <div class="step-num">04 / ВЫДАЧА</div>
+            <h4>Приёмка и гарантия</h4>
+            <p>Выдаём авто с официальным гарантийным талоном и рекомендациями по дальнейшему уходу.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div><strong>BLACKLINE Detailing</strong> · Ежедневно 09:00–21:00 · Премиальный уход за авто</div>
+      <div><a href="../../index.html" class="back-link">Заказать похожий сайт для своего бизнеса →</a></div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="bookingModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" onclick="closeBooking()" aria-label="Закрыть">×</button>
+      <h3 id="modalTitle" style="margin:0 0 8px;font-size:22px;">Запись в студию</h3>
+      <p style="margin:0 0 20px;color:var(--muted);font-size:14px;">Оставьте контакт — напишем в Telegram или WhatsApp и подтвердим время.</p>
+      <form id="bookingForm">
+        <div class="field">
+          <label for="serviceSelect">Выбранная услуга</label>
+          <input type="text" id="serviceSelect" readonly />
+        </div>
+        <div class="field">
+          <label for="carModel">Марка и модель авто</label>
+          <input type="text" id="carModel" placeholder="Например: BMW 5 серии" required />
+        </div>
+        <div class="field">
+          <label for="clientContact">Телефон или Telegram</label>
+          <input type="text" id="clientContact" placeholder="+7 (999) 000-00-00 или @username" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Отправить заявку</button>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <strong>Заявка зафиксирована!</strong><br />
+        В боевой версии данные мгновенно передаются в Telegram-бот студии или CRM-систему.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const servicesData = [
+      { tag: 'Хит продаж', title: 'Оклейка зон риска полиуретаном', desc: 'Капот, передний бампер, фары, крылья, зеркала и полоса на крышу. Надёжная защита от гравия.', prices: { sedan: 52000, crossover: 61000, suv: 72000 }, time: '1–2 дня' },
+      { tag: 'Восстановление', title: 'Глубокая полировка + 2 слоя керамики', desc: 'Удаление паутинки и царапин, возврат глубины цвета и защита от реагентов на 18 месяцев.', prices: { sedan: 28000, crossover: 34000, suv: 41000 }, time: '2 дня' },
+      { tag: 'Полная защита', title: 'Оклейка всего кузова (глянец / мат)', desc: 'Полиуретан премиум-серии с подворотами и гарантией 5 лет. Сохраняет заводской окрас.', prices: { sedan: 165000, crossover: 185000, suv: 215000 }, time: '4–5 дней' },
+      { tag: 'Интерьер', title: 'Детейлинг-химчистка салона', desc: 'Деликатная чистка кожи, алькантары, пластика, озонация от запахов и нанесение крема на кожу.', prices: { sedan: 14000, crossover: 16500, suv: 19500 }, time: '1 день' },
+      { tag: 'Стёкла', title: 'Антидождь на все стёкла + полировка фар', desc: 'Улучшает видимость в ливень и ночью, стеклоочистители работают тише и без разводов.', prices: { sedan: 5500, crossover: 6500, suv: 7500 }, time: '3 часа' },
+      { tag: 'Шумоизоляция', title: 'Шумоизоляция 4 арок и дверей', desc: 'Снижение дорожного гула от шин и улучшение звучания штатной акустики в салоне.', prices: { sedan: 24000, crossover: 27000, suv: 31000 }, time: '1 день' }
+    ];
+
+    const classLabels = { sedan: 'Седан / Купе', crossover: 'Кроссовер', suv: 'Внедорожник' };
+    const classMult = { sedan: 1, crossover: 1.15, suv: 1.32 };
+    let currentClass = 'sedan';
+
+    // Interactive Zone Configurator over Real Studio Car Photo
+    const zones = [
+      { id: 'z_hood', name: 'Капот целиком', short: 'Капот', base: 22000, pct: 25, on: true, x: 68, y: 39 },
+      { id: 'z_bumper', name: 'Передний бампер', short: 'Бампер', base: 21000, pct: 22, on: true, x: 78, y: 75 },
+      { id: 'z_lights', name: 'Оптика (фары + ПТФ)', short: 'Фары', base: 9000, pct: 13, on: true, x: 72, y: 58 },
+      { id: 'z_roof', name: 'Крыша + стойки', short: 'Крыша', base: 24000, pct: 18, on: false, x: 38, y: 26 },
+      { id: 'z_doors', name: '4 двери + пороги', short: 'Двери', base: 44000, pct: 22, on: false, x: 32, y: 54 }
+    ];
+
+    function renderZones() {
+      const pills = document.getElementById('zonePills');
+      const hotspots = document.getElementById('hotspotsLayer');
+      const list = document.getElementById('zoneList');
+      let sum = 0;
+      let pct = 0;
+      const mult = classMult[currentClass];
+
+      hotspots.innerHTML = zones.map((z, i) => `
+        <button type="button" class="hotspot-pin ${z.on ? 'active' : ''}" data-zi="${i}" style="left:${z.x}%;top:${z.y}%;">
+          <span class="pin-dot">${z.on ? '✓' : '+'}</span>
+          <span>${z.short}</span>
+        </button>
+      `).join('');
+
+      pills.innerHTML = zones.map((z, i) => `
+        <button type="button" class="zone-pill ${z.on ? 'active' : ''}" data-zi="${i}">${z.name}</button>
+      `).join('');
+
+      const activeZones = zones.filter(z => z.on);
+      list.innerHTML = activeZones.length
+        ? activeZones.map(z => {
+            const p = Math.round((z.base * mult) / 500) * 500;
+            sum += p;
+            pct += z.pct;
+            return `<li><span>✓ ${z.name}</span><strong>${p.toLocaleString('ru-RU')} ₽</strong></li>`;
+          }).join('')
+        : '<li><span>Выберите хотя бы 1 зону на авто</span><strong>0 ₽</strong></li>';
+
+      document.getElementById('armorPct').textContent = pct + '%';
+      document.getElementById('armorFill').style.width = pct + '%';
+      document.getElementById('zoneTotal').textContent = sum.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('zoneClassBadge').textContent = classLabels[currentClass];
+
+      document.querySelectorAll('.zone-pill, .hotspot-pin').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const i = Number(btn.dataset.zi);
+          zones[i].on = !zones[i].on;
+          renderZones();
+        });
+      });
+    }
+
+    document.getElementById('zoneBookBtn').addEventListener('click', () => {
+      const names = zones.filter(z => z.on).map(z => z.name).join(', ') || 'Консультация';
+      openBooking(`Набор защиты: ${names}`);
+    });
+
+    const servicesGrid = document.getElementById('servicesGrid');
+    function formatRub(n) { return n.toLocaleString('ru-RU') + ' ₽'; }
+
+    function renderServices() {
+      servicesGrid.innerHTML = servicesData.map(s => `
+        <article class="service-card">
+          <div>
+            <div class="service-tag">${s.tag}</div>
+            <h3>${s.title}</h3>
+            <p>${s.desc}</p>
+          </div>
+          <div class="service-meta">
+            <div>
+              <div class="price-val">от ${formatRub(s.prices[currentClass])}</div>
+              <div class="price-time">Срок: ${s.time}</div>
+            </div>
+            <button class="btn btn-outline" onclick="openBooking('${s.title}')">Выбрать</button>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    document.querySelectorAll('.class-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentClass = btn.dataset.class;
+        renderServices();
+        renderZones();
+      });
+    });
+
+    // Compare Before/After
+    const compareRange = document.getElementById('compareRange');
+    const compareBox = document.getElementById('compareBox');
+    const compareBefore = document.getElementById('compareBefore');
+    const compareBeforeInner = document.getElementById('compareBeforeInner');
+    const compareHandle = document.getElementById('compareHandle');
+
+    function syncCompareWidth() {
+      compareBeforeInner.style.width = compareBox.clientWidth + 'px';
+      compareBeforeInner.style.minWidth = compareBox.clientWidth + 'px';
+    }
+    window.addEventListener('resize', syncCompareWidth);
+    syncCompareWidth();
+
+    compareRange.addEventListener('input', (e) => {
+      const val = e.target.value + '%';
+      compareBefore.style.width = val;
+      compareHandle.style.left = val;
+    });
+
+    // Scroll Progress & Parallax
+    const heroBg = document.getElementById('heroBg');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100;
+      document.getElementById('scrollProgress').style.width = pct + '%';
+      if (window.scrollY < 700 && heroBg) {
+        heroBg.style.transform = `translate3d(0, ${Math.round(window.scrollY * 0.14)}px, 0) scale(1.05)`;
+      }
+    }, { passive: true });
+
+    // Scroll reveal + Hero count-up
+    const revealEls = document.querySelectorAll('.reveal, .scrub-line');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealEls.forEach(el => io.observe(el));
+    } else {
+      revealEls.forEach(el => el.classList.add('visible'));
+    }
+
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = Number(el.dataset.count);
+      const suffix = el.dataset.suffix || '';
+      const dur = 1100;
+      const start = performance.now();
+      function tick(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * eased).toLocaleString('ru-RU') + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+
+    const modal = document.getElementById('bookingModal');
+    const serviceInput = document.getElementById('serviceSelect');
+    const form = document.getElementById('bookingForm');
+    const success = document.getElementById('formSuccess');
+
+    function openBooking(serviceName) {
+      serviceInput.value = `${serviceName} (${classLabels[currentClass]})`;
+      form.style.display = 'block';
+      success.style.display = 'none';
+      modal.classList.add('open');
+    }
+    function closeBooking() { modal.classList.remove('open'); }
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeBooking(); });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      form.style.display = 'none';
+      success.style.display = 'block';
+    });
+
+    document.getElementById('burgerBtn').addEventListener('click', () => {
+      document.getElementById('mainNav').classList.toggle('open');
+    });
+
+    renderServices();
+    renderZones();
+  </script>
+</body>
+</html>

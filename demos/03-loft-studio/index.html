@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MATERIA — Мебель из массива дуба и стали на заказ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f6f2eb;
+      --surface: #fffdf9;
+      --espresso: #1f1c18;
+      --muted: #6b645c;
+      --copper: #b85d3b;
+      --copper-hover: #9f4d2e;
+      --border: #e5ddd1;
+      --radius: 16px;
+      --container: 1180px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--espresso);
+      line-height: 1.55;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font-family: inherit; }
+    img { display: block; max-width: 100%; }
+
+    .container { width: min(100% - 32px, var(--container)); margin-inline: auto; }
+
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #b85d3b, #d97706);
+      z-index: 120;
+    }
+
+    /* Scroll Reveal & Scrub Line */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .scrub-line {
+      height: 1px;
+      width: 28%;
+      background: linear-gradient(90deg, var(--copper), rgba(31, 28, 24, 0.14));
+      margin: 14px 0 30px;
+      transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .scrub-line.visible { width: 100%; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal, .scrub-line { opacity: 1; transform: none; width: 100%; transition: none; }
+      .ticker-track { animation: none !important; }
+    }
+
+    /* Demo top bar */
+    .demo-bar { background: #171411; color: #d6cfc7; font-size: 13px; padding: 8px 0; }
+    .demo-bar-inner { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .back-link { color: #e39172; font-weight: 600; }
+    .back-link:hover { text-decoration: underline; }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(246, 242, 235, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner { display: flex; justify-content: space-between; align-items: center; height: 76px; gap: 20px; }
+    .logo { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; font-weight: 700; letter-spacing: 0.06em; }
+    .nav { display: flex; gap: 28px; font-size: 14px; font-weight: 600; color: var(--muted); }
+    .nav a:hover { color: var(--espresso); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 22px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+    .btn-primary { background: var(--espresso); color: #fff; }
+    .btn-primary:hover { background: #36302a; transform: translateY(-2px); }
+    .btn-copper { background: var(--copper); color: #fff; }
+    .btn-copper:hover { background: var(--copper-hover); transform: translateY(-2px); }
+    .btn-outline { background: transparent; border-color: #cfc4b4; color: var(--espresso); }
+    .btn-outline:hover { background: #ede7dc; }
+    .burger { display: none; background: none; border: 1px solid var(--border); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+
+    /* Hero */
+    .hero { padding: 60px 0 74px; border-bottom: 1px solid var(--border); }
+    .hero-grid { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 44px; align-items: center; }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--copper);
+      margin-bottom: 14px;
+    }
+    h1 {
+      margin: 0 0 18px;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(36px, 5vw, 56px);
+      line-height: 1.04;
+      font-weight: 700;
+    }
+    .hero p { margin: 0 0 28px; color: var(--muted); font-size: 16px; max-width: 490px; }
+    .hero-stats { display: flex; gap: 28px; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+    .hero-stats strong { display: block; font-size: 22px; }
+    .hero-stats span { font-size: 12px; color: var(--muted); }
+    .hero-visual {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
+      box-shadow: 0 24px 54px rgba(31, 28, 24, 0.1);
+    }
+    .hero-photo { height: 390px; border-radius: 14px; overflow: hidden; position: relative; }
+    .hero-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.25s ease-out; will-change: transform; }
+    .hero-caption {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 8px 4px;
+      font-size: 13px;
+      color: var(--muted);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Ticker Ribbon */
+    .ticker {
+      background: var(--espresso);
+      color: #f6f2eb;
+      overflow: hidden;
+      padding: 10px 0;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .ticker-track { display: inline-flex; gap: 36px; animation: tickerMove 25s linear infinite; }
+    @keyframes tickerMove { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* Editorial Real-Photo Showroom & Project Specifier */
+    .showroom-section {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .showroom-grid {
+      display: grid;
+      grid-template-columns: 1.12fr 0.88fr;
+      gap: 36px;
+      align-items: start;
+    }
+    .showroom-stage {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px;
+    }
+    .showroom-frame {
+      position: relative;
+      height: 360px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #1f1c18;
+    }
+    .showroom-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s ease, transform 0.55s ease;
+    }
+    .showroom-frame.switching img { opacity: 0.3; transform: scale(1.03); }
+    .showroom-pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px 6px 7px;
+      border-radius: 999px;
+      background: rgba(31, 28, 24, 0.84);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      z-index: 3;
+    }
+    .showroom-pin:hover, .showroom-pin.active {
+      background: var(--copper);
+      border-color: #fff;
+      box-shadow: 0 0 0 6px rgba(184, 93, 59, 0.28);
+    }
+    .showroom-pin-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.22);
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+    }
+    .showroom-thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .sr-thumb {
+      border: 2px solid transparent;
+      border-radius: 10px;
+      overflow: hidden;
+      padding: 0;
+      height: 66px;
+      position: relative;
+      cursor: pointer;
+      background: #000;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .sr-thumb:hover { transform: translateY(-2px); }
+    .sr-thumb.active { border-color: var(--copper); }
+    .sr-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.72; transition: opacity 0.2s; }
+    .sr-thumb.active img, .sr-thumb:hover img { opacity: 1; }
+    .sr-thumb span {
+      position: absolute;
+      inset: auto 0 0 0;
+      padding: 4px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85));
+      text-align: left;
+    }
+    .swatch-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px 6px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .swatch-chip.active {
+      background: var(--espresso);
+      color: #fff;
+      border-color: var(--espresso);
+    }
+    .swatch-chip img {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .cfg-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+    }
+    .cfg-group { margin-bottom: 16px; }
+    .cfg-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--muted); }
+
+    /* Catalog */
+    section { padding: 72px 0; }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 34px; }
+    h2 { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(30px, 4vw, 42px); line-height: 1.1; }
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn.active { background: var(--espresso); color: #fff; border-color: var(--espresso); }
+
+    .catalog-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+    .product-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.28s, box-shadow 0.28s;
+    }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(31, 28, 24, 0.1); }
+    .product-art { height: 230px; overflow: hidden; position: relative; background: #e9e2d6; }
+    .product-art img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.45s ease; }
+    .product-card:hover .product-art img { transform: scale(1.06); }
+    .product-body { padding: 22px; display: flex; flex-direction: column; flex: 1; justify-content: space-between; }
+    .product-cat { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--copper); font-weight: 700; margin-bottom: 6px; }
+    .product-body h3 { margin: 0 0 8px; font-size: 18px; font-weight: 700; }
+    .product-body p { margin: 0 0 18px; font-size: 13px; color: var(--muted); }
+    .product-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .product-price { font-size: 18px; font-weight: 800; }
+
+    /* Photorealistic Materials Section */
+    .materials-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .materials-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 30px; }
+    .mat-card {
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.28s, box-shadow 0.28s;
+    }
+    .mat-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(31, 28, 24, 0.1); }
+    .mat-photo-wrap { height: 210px; position: relative; overflow: hidden; }
+    .mat-photo-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+    .mat-card:hover .mat-photo-wrap img { transform: scale(1.07); }
+    .mat-photo-wrap.walnut img { filter: brightness(0.76) contrast(1.16) saturate(0.92); }
+    .mat-photo-wrap.steel img { filter: brightness(0.84) contrast(1.18); }
+    .mat-tag {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(23, 20, 17, 0.84);
+      backdrop-filter: blur(6px);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+    .mat-body { padding: 22px; }
+    .mat-body h3 { margin: 0 0 8px; font-size: 19px; font-weight: 700; }
+    .mat-body p { margin: 0 0 14px; font-size: 14px; color: var(--muted); }
+    .mat-spec { font-size: 12px; font-weight: 700; color: var(--copper); }
+
+    /* Custom Banner */
+    .custom-banner { background: #1f1c18; color: #fff; border-radius: 20px; overflow: hidden; display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: stretch; }
+    .custom-banner-body { padding: 44px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+    .custom-banner-photo { min-height: 300px; overflow: hidden; }
+    .custom-banner-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Footer */
+    .footer { padding: 36px 0; font-size: 14px; color: var(--muted); border-top: 1px solid var(--border); }
+    .footer-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(23, 20, 17, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      place-items: center;
+      padding: 16px;
+      z-index: 100;
+    }
+    .modal-backdrop.open { display: grid; }
+    .modal {
+      width: min(100%, 500px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      position: relative;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid var(--border);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      z-index: 2;
+    }
+    .modal-thumb { width: 100%; height: 160px; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+    .modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .opt-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .opt-btn {
+      padding: 8px 13px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .opt-btn.active { background: var(--espresso); color: #fff; border-color: var(--espresso); }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--muted); }
+    .field input { width: 100%; padding: 11px 13px; border-radius: 10px; border: 1px solid var(--border); background: #fff; font-size: 14px; }
+    .cfg-summary { padding: 14px; border-radius: 12px; background: #efe9df; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    #cfgTotal, #srPriceOut, .price { white-space: nowrap; flex-shrink: 0; }
+    .showroom-stage, .cfg-panel { min-width: 0; }
+    .form-ok { display: none; padding: 16px; border-radius: 12px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; font-size: 14px; }
+
+    @media (max-width: 960px) {
+      .hero-grid, .catalog-grid, .materials-grid, .custom-banner, .showroom-grid { grid-template-columns: 1fr; }
+      .hero-photo { height: 300px; }
+    }
+    @media (max-width: 680px) {
+      .nav, .header-cta-desktop { display: none; }
+      .burger { display: inline-flex; }
+      .nav.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 76px;
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .custom-banner-body { padding: 28px; }
+      .showroom-frame { height: 250px; }
+      .showroom-thumbs { grid-template-columns: repeat(2, 1fr); }
+      .cfg-panel { padding: 20px; }
+      .cfg-summary .btn { flex: 1 1 auto; }
+    }
+    html.in-preview { scroll-behavior: auto !important; overflow: hidden !important; height: 100% !important; }
+    html.in-preview body { overflow: hidden !important; height: 100% !important; }
+    html.in-preview .demo-bar, html.in-preview .scroll-progress { display: none !important; }
+    html.in-preview .reveal, html.in-preview .scrub-line { opacity: 1 !important; transform: none !important; width: 100% !important; transition: none !important; }
+  </style>
+  <script>if (window.self !== window.top || location.search.indexOf('preview=1') !== -1) { document.documentElement.classList.add('in-preview'); window.scrollTo(0, 0); window.addEventListener('scroll', function () { if (window.scrollY) window.scrollTo(0, 0); }); }</script>
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <div class="demo-bar">
+    <div class="container demo-bar-inner">
+      <a class="back-link" href="../../index.html">← Назад в портфолио</a>
+      <span>Кейс #3 · Заказать такой сайт: <a href="https://t.me/DesAlexG" target="_blank" rel="noopener" class="back-link">@DesAlexG</a></span>
+    </div>
+  </div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo">MATERIA</a>
+      <nav class="nav" id="mainNav">
+        <a href="#showroom">Реализованные проекты</a>
+        <a href="#catalog">Каталог</a>
+        <a href="#materials">Материалы</a>
+        <a href="#custom">На заказ</a>
+      </nav>
+      <div>
+        <button class="btn btn-primary header-cta-desktop" onclick="openConfig(0)">Рассчитать изделие</button>
+        <button class="burger" id="burgerBtn" aria-label="Меню">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Столярная мастерская · Срок от 10 дней</div>
+          <h1>Мебель из цельного дуба и стали под ваши размеры</h1>
+          <p>Проектируем и изготавливаем обеденные столы, стеллажи и консоли с точностью до миллиметра. Покрытие натуральным маслом OSMO — безопасно для дома и служит десятилетиями.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="#showroom" class="btn btn-primary">Смотреть реализованные интерьеры</a>
+            <a href="#catalog" class="btn btn-outline">Выбрать в каталоге</a>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <strong>8–10%</strong>
+              <span>камерная сушка массива</span>
+            </div>
+            <div>
+              <strong data-count="5" data-suffix=" лет">5 лет</strong>
+              <span>гарантия на сварку и щит</span>
+            </div>
+            <div>
+              <strong data-count="14" data-suffix=" дней">14 дней</strong>
+              <span>средний срок производства</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-photo">
+            <img id="heroPhotoImg" src="../../assets/loft-hero.jpg" alt="Интерьер с мебелью из массива дуба и стальными светильниками" />
+          </div>
+          <div class="hero-caption">
+            <span><strong>Проект недели:</strong> Комплект для кухни-гостиной из дуба</span>
+            <span style="color:var(--copper);font-weight:700;">от 48 000 ₽</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker-track">
+        <span>★ Цельноламельный дуб 40 мм</span>
+        <span>★ Масло OSMO без запаха</span>
+        <span>★ Аргонная сварка стальных опор</span>
+        <span>★ Доставка по РФ в обрешётке</span>
+        <span>★ Цельноламельный дуб 40 мм</span>
+        <span>★ Масло OSMO без запаха</span>
+        <span>★ Аргонная сварка стальных опор</span>
+        <span>★ Доставка по РФ в обрешётке</span>
+      </div>
+    </div>
+
+    <section id="showroom" class="showroom-section">
+      <div class="container">
+        <div class="reveal">
+          <h2>Реализованные проекты в интерьерах</h2>
+          <p style="margin:6px 0 0;color:var(--muted);font-size:15px;">Переключайте готовые интерьеры, нажимайте на точки изделий на фото и подберите адаптацию под ваши габариты.</p>
+        </div>
+        <div class="scrub-line"></div>
+
+        <div class="showroom-grid reveal">
+          <div class="showroom-stage">
+            <div class="showroom-frame" id="srFrame">
+              <img id="srMainImg" src="../../assets/loft-hero.jpg" alt="Реализованный интерьер" />
+              <div id="srPins"></div>
+            </div>
+            <div class="showroom-thumbs" id="srThumbs"></div>
+          </div>
+
+          <div class="cfg-panel">
+            <div class="eyebrow" id="srCategory" style="margin-bottom:6px;">Кухня-гостиная · 2026</div>
+            <h3 id="srTitle" style="margin:0 0 8px;font-size:23px;font-family:'Cormorant Garamond',Georgia,serif;">Комплект Live Edge для кухни-гостиной</h3>
+            <p id="srDesc" style="margin:0 0 18px;font-size:14px;color:var(--muted);">Барный стол на Х-опоре, рабочая столешница и подвесные полки из цельного массива дуба.</p>
+
+            <div class="cfg-group">
+              <div class="cfg-label"><span>Выбранный акцент на фото</span><strong id="srPinNote" style="color:var(--copper);">Стол с живым краем</strong></div>
+            </div>
+
+            <div class="cfg-group">
+              <div class="cfg-label"><span>Порода массива</span></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;" id="srWoodOpts">
+                <button type="button" class="swatch-chip active" data-wood="Натуральный дуб" data-add="0" data-img="../../assets/mat-oak.jpg"><img src="../../assets/mat-oak.jpg" alt="" />Натуральный дуб</button>
+                <button type="button" class="swatch-chip" data-wood="Термоорех" data-add="7500" data-img="../../assets/mat-walnut.jpg"><img src="../../assets/mat-walnut.jpg" alt="" style="filter:brightness(0.76);" />Термоорех (+7 500 ₽)</button>
+              </div>
+            </div>
+
+            <div class="cfg-group">
+              <div class="cfg-label"><span>Масштаб исполнения</span></div>
+              <div class="opt-row" id="srScaleOpts" style="margin-bottom:0;">
+                <button type="button" class="opt-btn active" data-mult="1" data-lbl="Базовый размер">Базовый размер</button>
+                <button type="button" class="opt-btn" data-mult="1.25" data-lbl="Увеличенный (+25%)">Увеличенный (+25%)</button>
+              </div>
+            </div>
+
+            <div class="cfg-summary" style="margin-top:20px;">
+              <div>
+                <div style="font-size:12px;color:var(--muted);">Ориентир реализации:</div>
+                <strong id="srPriceOut" style="font-size:26px;">78 000 ₽</strong>
+              </div>
+              <button type="button" class="btn btn-copper" id="srOrderBtn">Рассчитать под себя</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="catalog">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2>Каталог моделей</h2>
+            <p style="margin:6px 0 0;color:var(--muted);font-size:15px;">Нажмите «Настроить» на любой карточке, чтобы выбрать размер и оттенок дерева.</p>
+          </div>
+          <div class="filter-bar">
+            <button class="filter-btn active" data-cat="all">Все изделия</button>
+            <button class="filter-btn" data-cat="table">Столы</button>
+            <button class="filter-btn" data-cat="shelf">Стеллажи</button>
+            <button class="filter-btn" data-cat="console">Консоли</button>
+          </div>
+        </div>
+
+        <div class="catalog-grid" id="catalogGrid"></div>
+      </div>
+    </section>
+
+    <section id="materials" class="materials-section">
+      <div class="container">
+        <div class="reveal">
+          <h2>Материалы, с которыми работаем</h2>
+          <p style="margin:8px 0 0;color:var(--muted);max-width:580px;">Используем камерно сушёную древесину влажностью 8–10% — столешницы не ведёт и они не трескаются от сухого воздуха в отопительный сезон.</p>
+        </div>
+        <div class="scrub-line"></div>
+        <div class="materials-grid">
+          <article class="mat-card reveal">
+            <div class="mat-photo-wrap">
+              <img src="../../assets/mat-oak.jpg" alt="Фактура натурального цельноламельного дуба" />
+              <span class="mat-tag">Массив 40 мм · OSMO масло</span>
+            </div>
+            <div class="mat-body">
+              <h3>Натуральный дуб</h3>
+              <p>Отборный цельноламельный щит с выразительным природным рисунком и тёплой медовой фактурой.</p>
+              <div class="mat-spec">Твёрдость по Бринеллю: 3.7 HB · Без сучков</div>
+            </div>
+          </article>
+
+          <article class="mat-card reveal">
+            <div class="mat-photo-wrap walnut">
+              <img src="../../assets/mat-walnut.jpg" alt="Фактура тёмного термоореха" />
+              <span class="mat-tag">Термообработка · Глубокий тон</span>
+            </div>
+            <div class="mat-body">
+              <h3>Термоорех</h3>
+              <p>Насыщенный шоколадно-ореховый оттенок для акцентных обеденных зон, кабинетов и переговорных.</p>
+              <div class="mat-spec">Устойчив к влаге и пятнам от кофе/вина</div>
+            </div>
+          </article>
+
+          <article class="mat-card reveal">
+            <div class="mat-photo-wrap steel">
+              <img src="../../assets/mat-steel.jpg" alt="Фактура стали с порошковой окраской муар" />
+              <span class="mat-tag">Профиль 60×30 · RAL 9005</span>
+            </div>
+            <div class="mat-body">
+              <h3>Сталь с порошковой окраской</h3>
+              <p>Запечённая в печи мелкозернистая матовая текстура «муар» — не царапается и не блестит дёшево.</p>
+              <div class="mat-spec">Аргонная сварка · Скрытые швы под 90°</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="custom">
+      <div class="container">
+        <div class="custom-banner reveal">
+          <div class="custom-banner-body">
+            <div class="eyebrow" style="color:#e39172;">Индивидуальные проекты</div>
+            <h2 style="color:#fff;margin-bottom:12px;">Есть эскиз или фото из Pinterest?</h2>
+            <p style="color:#d6cfc7;margin:0 0 24px;font-size:15px;">Отправьте картинку и нужные габариты — подготовим чертёж и точный расчёт стоимости за 1 рабочий день прямо в переписке.</p>
+            <button class="btn btn-copper" onclick="openConfig(0)">Отправить параметры на расчёт</button>
+          </div>
+          <div class="custom-banner-photo">
+            <img src="../../assets/loft-sunlight.jpg" alt="Деревянный стол и скамья в солнечном интерьере" />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div><strong>MATERIA Workshop</strong> · Доставка по РФ · Изготовление мебели на заказ</div>
+      <div><a href="../../index.html" class="back-link">Заказать такой сайт-каталог →</a></div>
+    </div>
+  </footer>
+
+  <div class="modal-backdrop" id="cfgModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" onclick="closeCfg()" aria-label="Закрыть">×</button>
+      <div class="modal-thumb">
+        <img id="cfgImg" src="../../assets/loft-dining.jpg" alt="Превью выбранной модели" />
+      </div>
+      <h3 id="cfgTitle" style="margin:0 0 6px;font-size:21px;">Настройка изделия</h3>
+      <p id="cfgSubtitle" style="margin:0 0 16px;font-size:13px;color:var(--muted);">Выберите размер и тон масла — стоимость пересчитается автоматически.</p>
+
+      <div id="cfgOptionsWrap">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">Размер</div>
+        <div class="opt-row" id="sizeOpts">
+          <button class="opt-btn active" data-add="0">160×80 см</button>
+          <button class="opt-btn" data-add="9000">200×90 см (+9 000 ₽)</button>
+          <button class="opt-btn" data-add="18000">240×100 см (+18 000 ₽)</button>
+        </div>
+
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px;">Оттенок массива</div>
+        <div class="opt-row" id="toneOpts">
+          <button class="opt-btn active" data-add="0">Натуральный дуб</button>
+          <button class="opt-btn" data-add="3500">Термоорех (+3 500 ₽)</button>
+          <button class="opt-btn" data-add="2500">Белёный ясень (+2 500 ₽)</button>
+        </div>
+      </div>
+
+      <div class="cfg-summary">
+        <span style="font-size:13px;color:var(--muted);">Предварительная стоимость:</span>
+        <strong id="cfgTotal" style="font-size:22px;">48 000 ₽</strong>
+      </div>
+
+      <form id="cfgForm">
+        <div class="field">
+          <label for="cfgContact">Ваш Telegram или телефон</label>
+          <input type="text" id="cfgContact" placeholder="@username или +7 (999) 000-00-00" required />
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;">Оформить заявку на расчёт</button>
+      </form>
+      <div class="form-ok" id="cfgOk">
+        <strong>Параметры сохранены!</strong><br />
+        В рабочем проекте выбранные размер, оттенок и цена сразу улетают в чат менеджеру.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const products = [
+      { cat: 'table', catName: 'Столы', title: 'Обеденный стол «Nordic»', desc: 'Цельноламельный щит 40 мм и устойчивое стальное подстолье П-профиля.', price: 48000, img: '../../assets/loft-dining.jpg' },
+      { cat: 'table', catName: 'Столы', title: 'Стол-комплект «Veranda»', desc: 'Массив дерева под террасным маслом для просторной кухни или загородного дома.', price: 52500, img: '../../assets/loft-sunlight.jpg' },
+      { cat: 'shelf', catName: 'Стеллажи', title: 'Библиотечный стеллаж «Grid»', desc: 'Стеллаж от пола до потолка из массива дуба для гостиной или зонирования.', price: 64000, img: '../../assets/loft-shelf.jpg' },
+      { cat: 'table', catName: 'Столы', title: 'Круглый стол «Bistro»', desc: 'Компактная модель для уютной столовой и завтраков, сочетается со шпоном дуба.', price: 39000, img: '../../assets/loft-round.jpg' },
+      { cat: 'console', catName: 'Консоли', title: 'Столешница и полки «Live Edge»', desc: 'Живой край дерева, брашированная текстура и кронштейны из матовой стали.', price: 34900, img: '../../assets/loft-hero.jpg' },
+      { cat: 'console', catName: 'Консоли', title: 'Обеденная группа «Classic»', desc: 'Элегантное сочетание тёмного дерева и светлой столешницы для спокойных интерьеров.', price: 44500, img: '../../assets/loft-decor.jpg' }
+    ];
+
+    let activeCat = 'all';
+    const grid = document.getElementById('catalogGrid');
+
+    function renderCatalog() {
+      const list = activeCat === 'all' ? products : products.filter(p => p.cat === activeCat);
+      grid.innerHTML = list.map((p) => {
+        const idx = products.indexOf(p);
+        return `
+          <article class="product-card">
+            <div class="product-art">
+              <img src="${p.img}" alt="${p.title}" />
+            </div>
+            <div class="product-body">
+              <div>
+                <div class="product-cat">${p.catName}</div>
+                <h3>${p.title}</h3>
+                <p>${p.desc}</p>
+              </div>
+              <div class="product-foot">
+                <div class="product-price">от ${p.price.toLocaleString('ru-RU')} ₽</div>
+                <button class="btn btn-outline" style="padding:9px 14px;" onclick="openConfig(${idx})">Настроить</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCat = btn.dataset.cat;
+        renderCatalog();
+      });
+    });
+
+    // === EDITORIAL PHOTO SHOWROOM & SPECIFIER ===
+    const showroomRooms = [
+      {
+        thumbLabel: 'Кухня-лофт',
+        cat: 'Кухня-гостиная · Массив 40 мм',
+        title: 'Комплект Live Edge для кухни-гостиной',
+        desc: 'Барный стол на Х-опоре, рабочая столешница и подвесные полки из цельного дуба под маслом OSMO.',
+        img: '../../assets/loft-hero.jpg',
+        basePrice: 78000,
+        pins: [
+          { x: 66, y: 60, name: 'Барный стол Live Edge', spec: 'Стол 180×75 см с живым краем — от 48 000 ₽' },
+          { x: 31, y: 38, name: 'Навесные полки', spec: 'Дуб 30 мм на кованых кронштейнах — от 12 000 ₽' },
+          { x: 24, y: 66, name: 'Кухонная столешница', spec: 'Влагостойкая пропитка OSMO — от 34 000 ₽' }
+        ]
+      },
+      {
+        thumbLabel: 'Столовая',
+        cat: 'Загородный дом · Обеденная зона',
+        title: 'Большой обеденный стол для семьи',
+        desc: 'Просторная столешница на 8 персон из отборного дуба и встроенный стеллаж для книг и декора.',
+        img: '../../assets/loft-dining.jpg',
+        basePrice: 64000,
+        pins: [
+          { x: 52, y: 74, name: 'Столешница 240 см', spec: 'Цельноламельный щит без сучков — от 54 000 ₽' },
+          { x: 82, y: 40, name: 'Встроенный стеллаж', spec: 'Полки по индивидуальному проёму — от 42 000 ₽' }
+        ]
+      },
+      {
+        thumbLabel: 'Веранда',
+        cat: 'Терраса и патио · Термомассив',
+        title: 'Обеденная группа «Veranda»',
+        desc: 'Массив с террасным маслом с УФ-защитой — не боится влажности и перепадов температуры.',
+        img: '../../assets/loft-sunlight.jpg',
+        basePrice: 52500,
+        pins: [
+          { x: 48, y: 46, name: 'Стол 200×90 см', spec: 'Защита от влаги и солнца — от 36 000 ₽' },
+          { x: 66, y: 36, name: 'Скамья со спинкой', spec: 'Надёжная сборка шип-паз — от 18 500 ₽' }
+        ]
+      },
+      {
+        thumbLabel: 'Кабинет',
+        cat: 'Гостиная и библиотека · Под потолок',
+        title: 'Библиотечный стеллаж «Grid»',
+        desc: 'Система хранения во всю стену с расчётом нагрузки под книги, винил и технику.',
+        img: '../../assets/loft-shelf.jpg',
+        basePrice: 89000,
+        pins: [
+          { x: 64, y: 42, name: 'Модуль от пола до потолка', spec: 'Секции под точные размеры стены — от 64 000 ₽' },
+          { x: 24, y: 72, name: 'Журнальный столик', spec: 'Шпон дуба и стальные опоры — от 24 000 ₽' }
+        ]
+      }
+    ];
+
+    const srState = { roomIdx: 0, pinIdx: 0, wood: 'Натуральный дуб', woodAdd: 0, woodImg: '../../assets/mat-oak.jpg', mult: 1, scaleLbl: 'Базовый размер' };
+
+    function renderShowroom(switchPhoto = false) {
+      const r = showroomRooms[srState.roomIdx];
+      const frame = document.getElementById('srFrame');
+      const applyContent = () => {
+        document.getElementById('srMainImg').src = r.img;
+        document.getElementById('srMainImg').alt = r.title;
+        document.getElementById('srCategory').textContent = r.cat;
+        document.getElementById('srTitle').textContent = r.title;
+        document.getElementById('srDesc').textContent = r.desc;
+
+        const pin = r.pins[srState.pinIdx] || r.pins[0];
+        document.getElementById('srPinNote').textContent = pin.spec;
+
+        document.getElementById('srPins').innerHTML = r.pins.map((p, pi) => `
+          <button type="button" class="showroom-pin ${pi === srState.pinIdx ? 'active' : ''}" data-pi="${pi}" style="left:${p.x}%;top:${p.y}%;">
+            <span class="showroom-pin-dot">${pi === srState.pinIdx ? '●' : '+'}</span>
+            <span>${p.name}</span>
+          </button>
+        `).join('');
+
+        document.querySelectorAll('#srPins .showroom-pin').forEach(btn => {
+          btn.addEventListener('click', () => {
+            srState.pinIdx = Number(btn.dataset.pi);
+            renderShowroom(false);
+          });
+        });
+      };
+
+      if (switchPhoto) {
+        frame.classList.add('switching');
+        setTimeout(() => { applyContent(); frame.classList.remove('switching'); }, 170);
+      } else {
+        applyContent();
+      }
+
+      document.getElementById('srThumbs').innerHTML = showroomRooms.map((rm, idx) => `
+        <button type="button" class="sr-thumb ${idx === srState.roomIdx ? 'active' : ''}" data-ri="${idx}">
+          <img src="${rm.img}" alt="${rm.thumbLabel}" />
+          <span>${rm.thumbLabel}</span>
+        </button>
+      `).join('');
+
+      document.querySelectorAll('#srThumbs .sr-thumb').forEach(btn => {
+        btn.addEventListener('click', () => {
+          srState.roomIdx = Number(btn.dataset.ri);
+          srState.pinIdx = 0;
+          renderShowroom(true);
+        });
+      });
+
+      const finalPrice = Math.round((r.basePrice * srState.mult + srState.woodAdd) / 500) * 500;
+      document.getElementById('srPriceOut').textContent = finalPrice.toLocaleString('ru-RU') + ' ₽';
+      return finalPrice;
+    }
+
+    document.querySelectorAll('#srWoodOpts .swatch-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#srWoodOpts .swatch-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        srState.wood = btn.dataset.wood;
+        srState.woodAdd = Number(btn.dataset.add);
+        srState.woodImg = btn.dataset.img;
+        renderShowroom(false);
+      });
+    });
+
+    document.querySelectorAll('#srScaleOpts .opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#srScaleOpts .opt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        srState.mult = Number(btn.dataset.mult);
+        srState.scaleLbl = btn.dataset.lbl;
+        renderShowroom(false);
+      });
+    });
+
+    document.getElementById('srOrderBtn').addEventListener('click', () => {
+      const r = showroomRooms[srState.roomIdx];
+      const price = renderShowroom(false);
+      selectedBase = price;
+      sizeAdd = 0; toneAdd = 0;
+      document.getElementById('cfgTitle').textContent = r.title;
+      document.getElementById('cfgSubtitle').textContent = `${srState.wood} · ${srState.scaleLbl}. Расчёт по проекту из шоурума.`;
+      document.getElementById('cfgImg').src = r.img;
+      document.getElementById('cfgOptionsWrap').style.display = 'none';
+      cfgForm.style.display = 'block';
+      cfgOk.style.display = 'none';
+      updateCfgPrice();
+      cfgModal.classList.add('open');
+    });
+    renderShowroom(false);
+
+    // Scroll Progress & Parallax
+    const heroPhoto = document.getElementById('heroPhotoImg');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100;
+      document.getElementById('scrollProgress').style.width = pct + '%';
+      if (window.scrollY < 700 && heroPhoto) {
+        heroPhoto.style.transform = `scale(${1 + window.scrollY * 0.00018})`;
+      }
+    }, { passive: true });
+
+    // Scroll reveal + Hero count-up
+    const revealEls = document.querySelectorAll('.reveal, .scrub-line');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      revealEls.forEach(el => io.observe(el));
+    } else {
+      revealEls.forEach(el => el.classList.add('visible'));
+    }
+
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = Number(el.dataset.count);
+      const suffix = el.dataset.suffix || '';
+      const dur = 1000;
+      const start = performance.now();
+      function tick(now) {
+        const p = Math.min(1, (now - start) / dur);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * eased) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    });
+
+    let selectedBase = 48000;
+    let sizeAdd = 0;
+    let toneAdd = 0;
+    const cfgModal = document.getElementById('cfgModal');
+    const cfgForm = document.getElementById('cfgForm');
+    const cfgOk = document.getElementById('cfgOk');
+
+    function updateCfgPrice() {
+      document.getElementById('cfgTotal').textContent = (selectedBase + sizeAdd + toneAdd).toLocaleString('ru-RU') + ' ₽';
+    }
+
+    function openConfig(index) {
+      const item = products[index];
+      selectedBase = item.price;
+      sizeAdd = 0;
+      toneAdd = 0;
+      document.getElementById('cfgOptionsWrap').style.display = 'block';
+      document.getElementById('cfgSubtitle').textContent = 'Выберите размер и тон масла — стоимость пересчитается автоматически.';
+      document.querySelectorAll('#sizeOpts .opt-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+      document.querySelectorAll('#toneOpts .opt-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+      document.getElementById('cfgTitle').textContent = item.title;
+      document.getElementById('cfgImg').src = item.img;
+      document.getElementById('cfgImg').alt = item.title;
+      cfgForm.style.display = 'block';
+      cfgOk.style.display = 'none';
+      updateCfgPrice();
+      cfgModal.classList.add('open');
+    }
+    function closeCfg() { cfgModal.classList.remove('open'); }
+    cfgModal.addEventListener('click', (e) => { if (e.target === cfgModal) closeCfg(); });
+
+    document.getElementById('sizeOpts').querySelectorAll('.opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#sizeOpts .opt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        sizeAdd = Number(btn.dataset.add);
+        updateCfgPrice();
+      });
+    });
+    document.getElementById('toneOpts').querySelectorAll('.opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#toneOpts .opt-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        toneAdd = Number(btn.dataset.add);
+        updateCfgPrice();
+      });
+    });
+
+    cfgForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      cfgForm.style.display = 'none';
+      cfgOk.style.display = 'block';
+    });
+
+    document.getElementById('burgerBtn').addEventListener('click', () => {
+      document.getElementById('mainNav').classList.toggle('open');
+    });
+
+    renderCatalog();
+  </script>
+</body>
+</html>
