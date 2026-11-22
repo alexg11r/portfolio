@@ -2084,7 +2084,11 @@
       requestAnimationFrame(tickRing);
     }
     setPositions();
-    requestAnimationFrame(tickRing);
+    if (!document.documentElement.classList.contains('in-preview')) {
+      requestAnimationFrame(tickRing);
+    } else {
+      ringCircle.style.strokeDashoffset = (CIRCUMFERENCE * 0.65).toFixed(1);
+    }
 
     // 3. Exclusive Single-Open FAQ Accordion
     const faqItems = Array.from(document.querySelectorAll('.faq-item'));
